@@ -17,6 +17,7 @@ class PowerUp:
         """
         pass
 
+
 class FreezePowerUp(PowerUp):
     def __init__(self):
         super().__init__(PowerUpTypes.FREEZE)
@@ -24,6 +25,7 @@ class FreezePowerUp(PowerUp):
     def apply_power_up(self):
         # Implement the logic for the Freeze power-up here
         pass
+
 
 class DoubleMovePowerUp(PowerUp):
     def __init__(self):

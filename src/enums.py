@@ -6,12 +6,13 @@ from enum import Enum
 
 class GameState(Enum):
     """Enum for the different states of the game."""
-    MENU = 0
-    SETTINGS = 1
-    PRE_GAME = 2
-    MID_GAME = 3
-    PAUSE = 4
-    GAME_OVER = 5
+    SPLASH = 0
+    MENU = 1
+    SETTINGS = 2
+    PRE_GAME = 3
+    MID_GAME = 4
+    PAUSE = 5
+    POST_GAME = 6
 
 
 class ChessColor(Enum):

@@ -2,7 +2,7 @@
 This module contains the Player class, representing a player.
 """
 from src.enums import ChessColor
-from src.power_up import PowerUp
+from src.mid_game.power_up import PowerUp
 
 
 class Player:
