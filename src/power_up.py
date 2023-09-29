@@ -1,38 +1,34 @@
 """
-Dieses Modul enthält die Klassen für die Power-Ups.
+This module contains the classes for the power-ups.
 """
 from src.enums import PowerUpTypes
 
 
 class PowerUp:
     """
-    Diese Klasse repräsentiert ein Power-Up.
+    This class represents a power-up.
     """
     def __init__(self, power_up_type: PowerUpTypes):
         self.power_up_type: PowerUpTypes = power_up_type
 
     def apply_power_up(self):
         """
-        Wendet das Power-Up an.
+        Applies the power-up.
         """
         pass
-
 
 class FreezePowerUp(PowerUp):
     def __init__(self):
         super().__init__(PowerUpTypes.FREEZE)
 
     def apply_power_up(self):
-        # Implementiere die Logik für das Freeze-Power-Up hier
+        # Implement the logic for the Freeze power-up here
         pass
-
 
 class DoubleMovePowerUp(PowerUp):
     def __init__(self):
         super().__init__(PowerUpTypes.DOUBLE_MOVE)
 
     def apply_power_up(self):
-        # Implementiere die Logik für das DoubleMove-Power-Up hier
+        # Implement the logic for the DoubleMove power-up here
         pass
-
-# Weitere Power-Up-Klassen können nach dem gleichen Muster hinzugefügt werden

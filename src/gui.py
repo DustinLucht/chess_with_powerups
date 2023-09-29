@@ -1,23 +1,23 @@
 """
-Dieses Modul enthält die Klasse GUI, die für die Anzeige des Schachbretts und
+This module contains the class GUI, responsible for displaying the chessboard and messages.
 """
 
 
 class GUI:
     """
-    Diese Klasse repräsentiert die GUI.
+    This class represents the GUI.
     """
     def display_board(self):
         """
-        Zeigt das Schachbrett an.
+        Displays the chessboard.
         """
-        # Implementiere die Anzeige des Schachbretts hier
+        # Implement the display of the chessboard here
         pass
 
     def show_message(self, message: str):
         """
-        Zeigt eine Nachricht an.
+        Displays a message.
         :param message: message to be displayed
         """
-        # Implementiere die Anzeige von Nachrichten hier
+        # Implement the display of messages here
         pass

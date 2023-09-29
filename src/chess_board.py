@@ -1,5 +1,5 @@
 """
-Dieses Modul enthält die Klasse Player, die einen Spieler repräsentiert.
+This module contains the ChessBoard class, representing a chess board.
 """
 import chess
 
@@ -9,30 +9,30 @@ from src.power_up import PowerUp
 
 class ChessBoard:
     """
-    Diese Klasse repräsentiert ein Schachbrett.
+    This class represents a chess board.
     """
     def __init__(self):
         self.board: chess.Board = chess.Board()
         self.current_player: Player or None = None
 
-    def get_possible_moves(self):
+    def get_possible_moves(self) -> list[chess.Move]:
         """
-        Gibt alle möglichen Züge für die gegebene Figur zurück.
-        :return: Liste mit allen möglichen Zügen
+        Returns all possible moves for the given piece.
+        :return: List with all possible moves
         """
         return list(self.board.legal_moves)
 
     def make_move(self, move: chess.Move):
         """
-        Führt den gegebenen Zug aus.
-        :param move: Der auszuführende Zug
+        Makes the given move.
+        :param move: The move to be executed
         """
         self.board.push(move)
 
     def apply_power_up(self, power_up: PowerUp):
         """
-        Wendet das gegebene Power-Up an.
-        :param power_up: Das anzuwendende Power-Up
+        Applies the given power-up.
+        :param power_up: The power-up to be applied
         """
-        # Implementiere die Anwendung des Power-Ups hier
+        # Implement the application of the power-up here
         pass

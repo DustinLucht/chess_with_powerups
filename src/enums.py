@@ -13,12 +13,10 @@ class GameState(Enum):
     PAUSE = 4
     GAME_OVER = 5
 
-
 class ChessColor(Enum):
     """Enum for the different colors of the chess pieces."""
     BLACK = 1
     WHITE = 2
-
 
 class PowerUpTypes(Enum):
     """Enum for the different types of power-ups."""

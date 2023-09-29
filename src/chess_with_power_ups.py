@@ -1,5 +1,5 @@
 """
-Dieses Modul enthält die Klasse GUI, die für die Anzeige des Schachbretts und
+This module contains the main class ChessWithPowerUps, representing the game.
 """
 from settings import Settings
 from chess_board import ChessBoard
@@ -9,7 +9,7 @@ from src.enums import GameState
 
 class ChessWithPowerUps:
     """
-    Diese Klasse repräsentiert das Spiel.
+    This class represents the game.
     """
     def __init__(self):
         self.settings = Settings()
@@ -19,23 +19,23 @@ class ChessWithPowerUps:
 
     def initialize_game(self):
         """
-        Initialisiert das Spiel.
+        Initializes the game.
         """
-        # Implementiere die Initialisierung des Spiels hier
+        # Implement the initialization of the game here
         pass
 
     def handle_state(self):
         """
-        Behandelt den aktuellen Zustand des Spiels.
+        Handles the current state of the game.
         """
-        # Implementiere die Zustandsbehandlung hier
+        # Implement the state handling here
         pass
 
     def handle_events(self):
         """
-        Behandelt die Events des Spiels.
+        Handles the events of the game.
         """
-        # Implementiere die Event-Behandlung hier
+        # Implement the event handling here
         pass
 
-    # Weitere Methoden für die Zustandsbehandlung, Event-Handling etc.
+    # Additional methods for state handling, event handling, etc.

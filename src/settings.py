@@ -1,5 +1,5 @@
 """
-Dieses Modul enthält die Klasse Player, die einen Spieler repräsentiert.
+This module contains the class Settings, which stores game settings.
 """
 
 
@@ -33,8 +33,8 @@ class Settings:
     def set_screensize(self, screensize_x: int, screensize_y: int):
         """
         Sets the size of the screen.
-        :param screensize_x: Die x Größe des Bildschirms
-        :param screensize_y: Die y Größe des Bildschirms
+        :param screensize_x: The x size of the screen
+        :param screensize_y: The y size of the screen
         """
         self.screensize_x = screensize_x
         self.screensize_y = screensize_y
@@ -56,7 +56,7 @@ class Settings:
     def update_settings(self, settings_dict):
         """
         Updates the settings with the given dictionary.
-        :param settings_dict: Das Dictionary mit den neuen Einstellungen
+        :param settings_dict: The dictionary with the new settings
         """
         self.single_player = settings_dict["single_player"]
         self.two_players = settings_dict["two_players"]
