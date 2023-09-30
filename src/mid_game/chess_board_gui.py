@@ -4,7 +4,22 @@ This module represents the chess board gui.
 import chess
 import pygame
 
-PIECES_SIZE = 0.7
+from src.mid_game.chess_board_figure import ChessBoardFigure
+
+PIECES = {
+    "b": "b_bishop_png_1024px.png",
+    "k": "b_king_png_1024px.png",
+    "n": "b_knight_png_1024px.png",
+    "p": "b_pawn_png_1024px.png",
+    "q": "b_queen_png_1024px.png",
+    "r": "b_rook_png_1024px.png",
+    "B": "w_bishop_png_1024px.png",
+    "K": "w_king_png_1024px.png",
+    "N": "w_knight_png_1024px.png",
+    "P": "w_pawn_png_1024px.png",
+    "Q": "w_queen_2x_ns.png",
+    "R": "w_rook_png_1024px.png"
+}
 
 
 class ChessBoardGui:
@@ -12,79 +27,64 @@ class ChessBoardGui:
     This class represents the chess board gui.
     """
 
-    def __init__(self, square_size: int, board_rotation: bool = False):
+    def __init__(self, board: chess.Board, square_size: int, pieces_size_multiplier: float,
+                 board_rotation: bool = False):
         self.square_size: int = square_size
+        self.pieces_size_multiplier: float = pieces_size_multiplier
         self.board_rotation: bool = board_rotation
-        self.b_bishop: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_bishop_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.b_king: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_king_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.b_knight: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_knight_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.b_pawn: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_pawn_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.b_queen: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_queen_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.b_rook: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\b_rook_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_bishop: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_bishop_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_king: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_king_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_knight: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_knight_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_pawn: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_pawn_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_queen: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_queen_2x_ns.png"), (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
-        self.w_rook: pygame.Surface = pygame.transform.scale(pygame.image.load(
-            "..\\assets\\images\\pieces\\w_rook_png_1024px.png"),
-            (square_size * PIECES_SIZE, square_size * PIECES_SIZE))
+        self.active_pieces: dict[int, ChessBoardFigure] = {}
+        for square_id in board.piece_map():
+            figure = board.piece_at(square_id)
+            if figure is not None:
+                self.active_pieces[square_id] = ChessBoardFigure(square_size * pieces_size_multiplier,
+                                                                 f"..\\assets\\images\\pieces\\"
+                                                                 f"{PIECES[str(figure)]}",
+                                                                 str(figure), chess.square_name(square_id),
+                                                                 (0, 0))
+        self.chess_field_name_to_index = {f"{chr(97 + x)}{y + 1}": x + y * 8 for x in range(8) for y in range(8)}
+        self.chess_index_to_field_name = {v: k for k, v in self.chess_field_name_to_index.items()}
 
-    def get_piece(self, piece) -> pygame.Surface or None:
+    def set_figures_according_to_board(self, board: chess.Board) -> None:
         """
-        Gets the piece.
-        :param piece:
-        :return: pygame.Surface or None
+        Sets the figures.
+        :param board: Board
         """
-        if piece == "b":
-            return self.b_bishop
-        elif piece == "k":
-            return self.b_king
-        elif piece == "n":
-            return self.b_knight
-        elif piece == "p":
-            return self.b_pawn
-        elif piece == "q":
-            return self.b_queen
-        elif piece == "r":
-            return self.b_rook
-        elif piece == "B":
-            return self.w_bishop
-        elif piece == "K":
-            return self.w_king
-        elif piece == "N":
-            return self.w_knight
-        elif piece == "P":
-            return self.w_pawn
-        elif piece == "Q":
-            return self.w_queen
-        elif piece == "R":
-            return self.w_rook
-        else:
-            return None
+        for square_id in board.piece_map():
+            figure = board.piece_at(square_id)
+            if figure is not None:
+                self.active_pieces[square_id].set_chess_position(chess.square_name(square_id))
+                if not self.active_pieces[square_id].is_dragging():
+                    x1, y1, x2, y2 = self.get_square_coordinates(chess.square_name(square_id))
+                    self.active_pieces[square_id].set_cord_position((
+                        x1 + (self.square_size - self.active_pieces[square_id].size) / 2,
+                        y1 + (self.square_size - self.active_pieces[square_id].size) / 2))
+        # find all pieces that are not on the board anymore
+        pieces_to_remove = []
+        for square_id in self.active_pieces:
+            if square_id not in board.piece_map():
+                pieces_to_remove.append(square_id)
+        # remove them
+        for square_id in pieces_to_remove:
+            del self.active_pieces[square_id]
 
-    def draw_chessboard(self, surface: pygame.Surface):
+    def get_figure_by_square_id(self, square_id: int) -> ChessBoardFigure:
+        """
+        Gets the figure by square id.
+        :param square_id: Square id
+        :return: Figure
+        """
+        return self.active_pieces[square_id]
+
+    def move_figure(self, old_square_id: int, new_square_id: int) -> None:
+        """
+        Moves the figure.
+        :param old_square_id: Old square id
+        :param new_square_id: New square id
+        """
+        self.active_pieces[new_square_id] = self.active_pieces[old_square_id]
+        del self.active_pieces[old_square_id]
+
+    def draw_chessboard(self, surface: pygame.Surface) -> None:
         """
         Creates a chessboard.
         :param surface: Surface to draw on
@@ -110,32 +110,17 @@ class ChessBoardGui:
                 text_rect = text.get_rect(center=rect.center)
                 surface.blit(text, text_rect)
 
-    def draw_figure(self, surface: pygame.Surface, figure: str, square_id: str):
-        """
-        Draw a figure on the chessboard.
-        :param surface: Surface to draw on
-        :param figure: Figure to draw
-        :param square_id: Square id
-        """
-        x1, y1, x2, y2 = self.get_square_coordinates(square_id)
-        # center the drawing
-        x1 += (self.square_size - self.square_size * PIECES_SIZE) / 2
-        y1 += (self.square_size - self.square_size * PIECES_SIZE) / 2
-        rect = pygame.Rect(x1, y1, x2, y2)
-        surface.blit(self.get_piece(figure), rect)
-
-    def draw_figures(self, surface: pygame.Surface, board: chess.Board):
+    def draw_figures(self, surface: pygame.Surface) -> None:
         """
         Draw all figures on the chessboard.
         :param surface: Surface to draw on
-        :param board: Board to draw
         """
-        for square_id in chess.SQUARES:
-            figure = board.piece_at(square_id)
-            if figure is not None:
-                self.draw_figure(surface, str(figure), chess.square_name(square_id))
+        for name, piece in self.active_pieces.items():
+            x1, y1 = piece.cord_position
+            rect = pygame.Rect(x1, y1, x1, y1)
+            surface.blit(piece.figure, rect)
 
-    def get_correlating_square_id_or_none(self, pos: tuple) -> str or None:
+    def get_correlating_square_name_or_none(self, pos: tuple) -> str or None:
         """
         Get the correlating square id or None if not found.
         :param pos: Position of the mouse
@@ -157,6 +142,18 @@ class ChessBoardGui:
 
         return f"{chr(97 + x)}{8 - y}"
 
+    def get_correlating_square_id_or_none(self, pos: tuple) -> str or None:
+        """
+        Get the correlating square id or None if not found.
+        :param pos: Position of the mouse
+        :return: Square id or None
+        """
+        name = self.get_correlating_square_name_or_none(pos)
+        if name not in self.chess_field_name_to_index:
+            print(f"get_correlating_square_id_or_none {name} from pos {pos} not in CHESS_FIELD_NAME_TO_INDEX")
+            return None
+        return self.chess_field_name_to_index[name]
+
     def get_square_coordinates(self, square_id: str) -> tuple:
         """
         Get the correlating square coordinates.
@@ -171,4 +168,5 @@ class ChessBoardGui:
             x = 7 - x
             y = 7 - y
 
-        return x * self.square_size, y * self.square_size, x * self.square_size + self.square_size, y * self.square_size + self.square_size
+        return (x * self.square_size, y * self.square_size, x * self.square_size + self.square_size,
+                y * self.square_size + self.square_size)
