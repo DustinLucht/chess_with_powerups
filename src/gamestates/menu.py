@@ -67,6 +67,8 @@ class Menu(BaseState):
         super(Menu, self).startup(persistent)
         self.background_image = persistent["background_image"]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        self.next_state = GameState.PRE_GAME
+        self.done = True
 
     def get_event(self, event):
         if event.type == pygame.QUIT:

@@ -47,6 +47,9 @@ class PreGame(BaseState):
         super(PreGame, self).startup(persistent)
         self.background_image = persistent["background_image"]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        self.next_state = GameState.MID_GAME
+        self.set_persist()
+        self.done = True
 
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
@@ -90,7 +93,14 @@ class PreGame(BaseState):
             self.next_state = GameState.MENU
         elif event == "Start":
             self.next_state = GameState.MID_GAME
-            self.persist["single_player"] = self.toggle_single_player.getValue()
-            self.persist["difficulty"] = self.slider_difficulty.getValue()
-            self.persist["power_up_multiplicator"] = self.slider_power_up_multiplicator.getValue()
+            self.set_persist()
         self.done = True
+
+    def set_persist(self) -> None:
+        """
+        Starts the game.
+        """
+        self.persist["single_player"] = self.toggle_single_player.getValue()
+        self.persist["difficulty"] = self.slider_difficulty.getValue()
+        self.persist["power_up_multiplicator"] = self.slider_power_up_multiplicator.getValue()
+
