@@ -22,6 +22,10 @@ class Splash(BaseState):
         self.current_alpha = max(0, int((self.time_active / 5000) * 255))
         self.background_image.set_alpha(self.current_alpha)
 
+    def get_event(self, event):
+        if event.type == pygame.QUIT:
+            self.quit = True
+
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)

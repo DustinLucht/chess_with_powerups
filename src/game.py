@@ -1,4 +1,5 @@
 import pygame
+import pygame_widgets
 
 from src.enums import GameState
 from src.gamestates.base import BaseState
@@ -22,7 +23,9 @@ class Game(object):
         Handles events.
         :return: None
         """
-        for event in pygame.event.get():
+        events = pygame.event.get()
+        pygame_widgets.update(events)
+        for event in events:
             self.state.get_event(event)
 
     def flip_state(self) -> None:

@@ -1,6 +1,8 @@
 """
 Settings game state
 """
+import pygame
+
 from .base import BaseState
 from ..enums import GameState
 
@@ -10,8 +12,9 @@ class Settings(BaseState):
         super(Settings, self).__init__()
         self.next_state = GameState.MENU
 
-    def update(self, dt):
-        pass
+    def get_event(self, event):
+        if event.type == pygame.QUIT:
+            self.quit = True
 
     def draw(self, surface):
         pass

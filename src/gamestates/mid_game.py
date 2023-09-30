@@ -1,6 +1,8 @@
 """
 MidGame class
 """
+import pygame
+
 from .base import BaseState
 
 
@@ -10,7 +12,8 @@ class MidGame(BaseState):
         pass
 
     def get_event(self, event):
-        pass
+        if event.type == pygame.QUIT:
+            self.quit = True
 
     def draw(self, surface):
         pass
