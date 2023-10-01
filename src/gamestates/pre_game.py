@@ -20,27 +20,33 @@ class PreGame(BaseState):
         self.toggle_single_player: Toggle = Toggle(pygame.display.get_surface(), 1000, 100, 200, 40,
                                                    fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
                                                    handleColour=(150, 150, 150), handleRadius=18, initial=True)
+        self.textbox_starts_render: pygame.Surface = self.font.render("Du spielst als: weiß", True, (255, 255, 255))
+        self.toggle_playing_as: Toggle = Toggle(pygame.display.get_surface(), 1000, 250, 200, 40,
+                                                fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
+                                                handleColour=(150, 150, 150), handleRadius=18, initial=True)
         self.textbox_difficulty_render: pygame.Surface = self.font.render("Schwierigkeit: 10.0", True, (255, 255, 255))
-        self.slider_difficulty: Slider = Slider(pygame.display.get_surface(), 1000, 250, 800, 40, min=0.1,
+        self.slider_difficulty: Slider = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=0.1,
                                                 max=10, step=0.1, handleColour=(150, 150, 150), handleRadius=18,
                                                 initial=1)
         self.textbox_power_up_multiplier: pygame.Surface = self.font.render("Power Up Muliplicator: 1", True,
                                                                             (255, 255, 255))
-        self.slider_power_up_multiplier: Slider = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=1,
+        self.slider_power_up_multiplier: Slider = Slider(pygame.display.get_surface(), 1000, 550, 800, 40, min=1,
                                                          max=10, step=1, handleColour=(150, 150, 150),
                                                          handleRadius=18,
                                                          initial=1)
-        self.button_back = Button(pygame.display.get_surface(), 1000, 550, 200, 40, text="Zurück", fontSize=30,
+        self.button_back = Button(pygame.display.get_surface(), 1000, 700, 200, 40, text="Zurück", fontSize=30,
                                   inactiveColour=(141, 185, 244), pressedColour=(50, 50, 255), radius=20,
                                   hoverColour=(100, 100, 255),
                                   onRelease=self.handle_action, onReleaseParams=["Zurück"])
-        self.button_start = Button(pygame.display.get_surface(), 1400, 550, 200, 40, text="Start", fontSize=30,
+        self.button_start = Button(pygame.display.get_surface(), 1400, 700, 200, 40, text="Start", fontSize=30,
                                    inactiveColour=(141, 185, 244), pressedColour=(50, 50, 255), radius=20,
                                    hoverColour=(100, 100, 255),
                                    onRelease=self.handle_action, onReleaseParams=["Start"])
 
         self.single_player: bool = True
         self.difficulty: float = 1.0
+        self.start_with_white: bool = True
+        self.toggle_playing_as.toggle()
         self.power_up_multiplier: int = 1
 
     def startup(self, persistent):
@@ -57,9 +63,11 @@ class PreGame(BaseState):
 
         surface.blit(self.textbox_single_player_render, (1000, 50))
         self.toggle_single_player.draw()
-        surface.blit(self.textbox_difficulty_render, (1000, 200))
+        surface.blit(self.textbox_starts_render, (1000, 200))
+        self.toggle_playing_as.draw()
+        surface.blit(self.textbox_difficulty_render, (1000, 350))
         self.slider_difficulty.draw()
-        surface.blit(self.textbox_power_up_multiplier, (1000, 350))
+        surface.blit(self.textbox_power_up_multiplier, (1000, 500))
         self.slider_power_up_multiplier.draw()
         self.button_back.draw()
         self.button_start.draw()
@@ -71,6 +79,8 @@ class PreGame(BaseState):
     def update(self, dt):
         self.textbox_single_player_render = self.get_text_render(
             f"Mehrspieler:  {'An' if self.toggle_single_player.getValue() else 'Aus'}")
+        self.textbox_starts_render = self.get_text_render(
+            f"Du spielst als:  {'weiß' if self.toggle_playing_as.getValue() else 'schwarz'}")
         self.textbox_difficulty_render = self.get_text_render(
             f"Schwierigkeit:  {round(self.slider_difficulty.getValue(), 1)}")
         self.textbox_power_up_multiplier = self.get_text_render(
@@ -101,6 +111,6 @@ class PreGame(BaseState):
         Starts the game.
         """
         self.persist[PersistentDataKeys.SINGLE_PLAYER] = self.toggle_single_player.getValue()
-        self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = True  # TODO: implement
+        self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.start_with_white
         self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue()
         self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()

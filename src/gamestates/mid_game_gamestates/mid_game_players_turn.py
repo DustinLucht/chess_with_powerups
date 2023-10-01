@@ -5,7 +5,6 @@ import pygame
 import chess
 from src.enums import ChessColor, MidGamePersistentDataKeys
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
-from src.mid_game.chess_board_gui import ChessBoardGui
 from src.mid_game.player import Player
 
 

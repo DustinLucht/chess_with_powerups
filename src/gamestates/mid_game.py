@@ -26,8 +26,6 @@ class MidGame(BaseState):
         # background
         self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
-        # quick dirty button
-        self.button = pygame.Rect(1500, 10, 100, 50)
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -91,11 +89,6 @@ class MidGame(BaseState):
                 else:
                     self.mid_game_state.next_state = MidGameState.PAUSE
                     self.flip_state()
-        elif event.type == pygame.MOUSEBUTTONUP:
-            if event.button == 1:
-                # check button
-                if self.button.collidepoint(event.pos):
-                    self.mid_game_state.board_gui.rotate_board(self.mid_game_state.board)
         self.mid_game_state.get_event(event)
 
     def update(self, dt):
@@ -107,4 +100,3 @@ class MidGame(BaseState):
 
     def draw(self, surface):
         self.mid_game_state.draw(surface)
-        pygame.draw.rect(surface, pygame.Color("red"), self.button)
