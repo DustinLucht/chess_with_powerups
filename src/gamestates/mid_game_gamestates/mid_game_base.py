@@ -3,27 +3,27 @@ This module contains the base state.
 """
 import pygame
 
-from src.enums import GameState, PersistentDataKeys
+from src.enums import MidGamePersistentDataKeys, MidGameState
 
 
-class BaseState(object):
+class MidGameBaseState(object):
     """
     This class represents the base state.
     """
     def __init__(self) -> None:
         self.done: bool = False
         self.quit: bool = False
-        self.next_state: GameState = GameState.MENU
+        self.next_state: MidGameState = MidGameState.PAUSE
         self.screen_rect: pygame.Rect = pygame.display.get_surface().get_rect()
-        self.persist: dict[PersistentDataKeys, object] = {}
+        self.mid_game_persist: dict[MidGamePersistentDataKeys, object] = {}
         self.font: pygame.font.Font = pygame.font.Font(None, 24)
 
-    def startup(self, persistent: dict) -> None:
+    def startup(self, mid_game_persistent: dict) -> None:
         """
         Starts up the state.
-        :param persistent: persistent data
+        :param mid_game_persistent: mid_game_persistent data
         """
-        self.persist = persistent
+        self.mid_game_persist = mid_game_persistent
 
     def get_event(self, event: pygame.event.Event) -> None:
         """

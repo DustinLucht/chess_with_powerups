@@ -3,7 +3,7 @@ Menu game state
 """
 import pygame
 from .base import BaseState
-from ..enums import GameState
+from ..enums import GameState, PersistentDataKeys
 
 
 class Menu(BaseState):
@@ -65,7 +65,7 @@ class Menu(BaseState):
 
     def startup(self, persistent):
         super(Menu, self).startup(persistent)
-        self.background_image = persistent["background_image"]
+        self.background_image = persistent[PersistentDataKeys.BACKGROUND_IMAGE]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
         self.next_state = GameState.PRE_GAME
         self.done = True

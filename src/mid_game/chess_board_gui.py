@@ -75,7 +75,7 @@ class ChessBoardGui:
         """
         return self.active_pieces[square_id]
 
-    def move_figure(self, old_square_id: int, new_square_id: int) -> None:
+    def move_figure_and_del_old(self, old_square_id: int, new_square_id: int) -> None:
         """
         Moves the figure.
         :param old_square_id: Old square id
@@ -115,10 +115,17 @@ class ChessBoardGui:
         Draw all figures on the chessboard.
         :param surface: Surface to draw on
         """
+        drag_piece, drag_rect = None, None
         for name, piece in self.active_pieces.items():
             x1, y1 = piece.cord_position
             rect = pygame.Rect(x1, y1, x1, y1)
-            surface.blit(piece.figure, rect)
+            if piece.is_dragging():
+                drag_piece = piece
+                drag_rect = rect
+            else:
+                surface.blit(piece.figure, rect)
+        if drag_piece is not None:
+            surface.blit(drag_piece.figure, drag_rect)
 
     def get_correlating_square_name_or_none(self, pos: tuple) -> str or None:
         """

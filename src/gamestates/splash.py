@@ -1,6 +1,6 @@
 import pygame
 from .base import BaseState
-from ..enums import GameState
+from ..enums import GameState, PersistentDataKeys
 
 
 class Splash(BaseState):
@@ -17,7 +17,7 @@ class Splash(BaseState):
     def update(self, dt):
         self.time_active += dt
         if self.time_active >= 500:
-            self.persist["background_image"] = self.background_image
+            self.persist[PersistentDataKeys.BACKGROUND_IMAGE] = self.background_image
             self.done = True
         self.current_alpha = max(0, int((self.time_active / 5000) * 255))
         self.background_image.set_alpha(self.current_alpha)

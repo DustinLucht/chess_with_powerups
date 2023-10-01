@@ -15,6 +15,30 @@ class GameState(Enum):
     POST_GAME = 6
 
 
+class MidGameState(Enum):
+    """Enum for the different states of the mid game."""
+    PLAYERS_1_TURN = 0
+    PLAYERS_2_TURN = 1
+    PAUSE = 2
+
+
+class PersistentDataKeys(Enum):
+    """Enum for the different keys of the persistent data."""
+    BACKGROUND_IMAGE = 0
+    SINGLE_PLAYER = 1
+    STARTS_WITH_WHITE = 2
+    DIFFICULTY = 3
+    POWER_UP_MULTIPLICATOR = 4
+
+
+class MidGamePersistentDataKeys(Enum):
+    """Enum for the different keys of the persistent data."""
+    BACKGROUND_IMAGE = 0
+    BOARD = 1
+    BOARD_GUI = 2
+    CURRENT_TURN = 3
+
+
 class ChessColor(Enum):
     """Enum for the different colors of the chess pieces."""
     BLACK = 1

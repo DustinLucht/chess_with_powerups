@@ -1,7 +1,7 @@
 import pygame
 
 from .base import BaseState
-from ..enums import GameState
+from ..enums import GameState, PersistentDataKeys
 from pygame_widgets.slider import Slider
 from pygame_widgets.toggle import Toggle
 from pygame_widgets.button import Button
@@ -24,12 +24,12 @@ class PreGame(BaseState):
         self.slider_difficulty: Slider = Slider(pygame.display.get_surface(), 1000, 250, 800, 40, min=0.1,
                                                 max=10, step=0.1, handleColour=(150, 150, 150), handleRadius=18,
                                                 initial=1)
-        self.textbox_power_up_multiplicator: pygame.Surface = self.font.render("Power Up Muliplicator: 1", True,
-                                                                               (255, 255, 255))
-        self.slider_power_up_multiplicator: Slider = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=1,
-                                                            max=10, step=1, handleColour=(150, 150, 150),
-                                                            handleRadius=18,
-                                                            initial=1)
+        self.textbox_power_up_multiplier: pygame.Surface = self.font.render("Power Up Muliplicator: 1", True,
+                                                                            (255, 255, 255))
+        self.slider_power_up_multiplier: Slider = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=1,
+                                                         max=10, step=1, handleColour=(150, 150, 150),
+                                                         handleRadius=18,
+                                                         initial=1)
         self.button_back = Button(pygame.display.get_surface(), 1000, 550, 200, 40, text="Zurück", fontSize=30,
                                   inactiveColour=(141, 185, 244), pressedColour=(50, 50, 255), radius=20,
                                   hoverColour=(100, 100, 255),
@@ -41,11 +41,11 @@ class PreGame(BaseState):
 
         self.single_player: bool = True
         self.difficulty: float = 1.0
-        self.power_up_multiplicator: int = 1
+        self.power_up_multiplier: int = 1
 
     def startup(self, persistent):
         super(PreGame, self).startup(persistent)
-        self.background_image = persistent["background_image"]
+        self.background_image = persistent[PersistentDataKeys.BACKGROUND_IMAGE]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
         self.next_state = GameState.MID_GAME
         self.set_persist()
@@ -59,8 +59,8 @@ class PreGame(BaseState):
         self.toggle_single_player.draw()
         surface.blit(self.textbox_difficulty_render, (1000, 200))
         self.slider_difficulty.draw()
-        surface.blit(self.textbox_power_up_multiplicator, (1000, 350))
-        self.slider_power_up_multiplicator.draw()
+        surface.blit(self.textbox_power_up_multiplier, (1000, 350))
+        self.slider_power_up_multiplier.draw()
         self.button_back.draw()
         self.button_start.draw()
 
@@ -73,8 +73,8 @@ class PreGame(BaseState):
             f"Mehrspieler:  {'An' if self.toggle_single_player.getValue() else 'Aus'}")
         self.textbox_difficulty_render = self.get_text_render(
             f"Schwierigkeit:  {round(self.slider_difficulty.getValue(), 1)}")
-        self.textbox_power_up_multiplicator = self.get_text_render(
-            f"Power Up Muliplicator:  {round(self.slider_power_up_multiplicator.getValue(), 1)}")
+        self.textbox_power_up_multiplier = self.get_text_render(
+            f"Power Up Muliplicator:  {round(self.slider_power_up_multiplier.getValue(), 1)}")
 
     def get_text_render(self, text: str) -> pygame.Surface:
         """
@@ -100,7 +100,7 @@ class PreGame(BaseState):
         """
         Starts the game.
         """
-        self.persist["single_player"] = self.toggle_single_player.getValue()
-        self.persist["difficulty"] = self.slider_difficulty.getValue()
-        self.persist["power_up_multiplicator"] = self.slider_power_up_multiplicator.getValue()
-
+        self.persist[PersistentDataKeys.SINGLE_PLAYER] = self.toggle_single_player.getValue()
+        self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = True  # TODO: implement
+        self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue()
+        self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()
