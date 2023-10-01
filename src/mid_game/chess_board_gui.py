@@ -51,16 +51,7 @@ class ChessBoardGui:
     def set_figures_according_to_board(self) -> None:
         """
         Sets the figures.
-        :param board: Board
         """
-        for square_id in self.board.piece_map():
-            figure = self.board.piece_at(square_id)
-            if figure is not None:
-                piece = self.active_pieces.get(square_id)
-                piece.set_chess_position(chess.square_name(square_id))
-                if not piece.is_dragging():
-                    piece.set_cord_position(
-                        (self._get_square_coordinates_for_centered_figure(chess.square_name(square_id), piece.size)))
         # find all pieces that are not on the board anymore
         pieces_to_remove = []
         for square_id in self.active_pieces:
@@ -69,6 +60,23 @@ class ChessBoardGui:
         # remove them
         for square_id in pieces_to_remove:
             del self.active_pieces[square_id]
+        # find all pieces that are new on the board (castling)
+        for square_id in self.board.piece_map():
+            if square_id not in self.active_pieces:
+                figure = self.board.piece_at(square_id)
+                self.active_pieces[square_id] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
+                                                                 f"..\\assets\\images\\pieces\\"
+                                                                 f"{PIECES[str(figure)]}",
+                                                                 str(figure), chess.square_name(square_id),
+                                                                 (0, 0))
+        for square_id in self.board.piece_map():
+            figure = self.board.piece_at(square_id)
+            if figure is not None:
+                piece = self.active_pieces.get(square_id)
+                piece.set_chess_position(chess.square_name(square_id))
+                if not piece.is_dragging():
+                    piece.set_cord_position(
+                        (self._get_square_coordinates_for_centered_figure(chess.square_name(square_id), piece.size)))
 
     def set_selected_square(self, mouse_pos: tuple[int, int]) -> None:
         """
