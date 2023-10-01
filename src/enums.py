@@ -39,6 +39,13 @@ class MidGamePersistentDataKeys(Enum):
     CURRENT_TURN = 3
 
 
+class OverlayType(Enum):
+    """Enum for the different types of overlays."""
+    SELECTED_FIGURE = 0
+    POSSIBLE_MOVE_NORMAL = 1
+    POSSIBLE_MOVE_ATTACK = 2
+
+
 class ChessColor(Enum):
     """Enum for the different colors of the chess pieces."""
     BLACK = 1

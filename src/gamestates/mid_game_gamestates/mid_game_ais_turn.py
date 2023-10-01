@@ -30,8 +30,7 @@ class MidGameAIsTurn(MidGameBaseState):
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)
-        self.board_gui.draw_chessboard(surface)
-        self.board_gui.draw_figures(surface)
+        self.board_gui.draw(surface)
 
     def update(self, dt):
         pass
