@@ -23,6 +23,7 @@ class SquareOverlay:
         x, y = center_pos
         self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
         self.overlay_surface = pygame.Surface((square_size, square_size), pygame.SRCALPHA)
+        self.overlay_surface.set_alpha(100)
 
     def draw(self, surface: pygame.Surface) -> None:
         """

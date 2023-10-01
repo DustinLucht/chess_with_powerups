@@ -33,10 +33,7 @@ class PersistentDataKeys(Enum):
 
 class MidGamePersistentDataKeys(Enum):
     """Enum for the different keys of the persistent data."""
-    BACKGROUND_IMAGE = 0
-    BOARD = 1
-    BOARD_GUI = 2
-    CURRENT_TURN = 3
+    CURRENT_TURN = 0
 
 
 class OverlayType(Enum):
@@ -48,8 +45,8 @@ class OverlayType(Enum):
 
 class ChessColor(Enum):
     """Enum for the different colors of the chess pieces."""
-    BLACK = 1
-    WHITE = 2
+    BLACK = False
+    WHITE = True
 
 
 class PowerUpTypes(Enum):

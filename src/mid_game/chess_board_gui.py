@@ -31,6 +31,7 @@ class ChessBoardGui:
 
     def __init__(self, board: chess.Board, square_size: int, pieces_size_multiplier: float,
                  board_rotation: bool = False):
+        self.board: chess.Board = board
         self.square_size: int = square_size
         self.pieces_size_multiplier: float = pieces_size_multiplier
         self.board_rotation: bool = board_rotation
@@ -47,13 +48,13 @@ class ChessBoardGui:
         self.chess_field_name_to_index = {f"{chr(97 + x)}{y + 1}": x + y * 8 for x in range(8) for y in range(8)}
         self.chess_index_to_field_name = {v: k for k, v in self.chess_field_name_to_index.items()}
 
-    def set_figures_according_to_board(self, board: chess.Board) -> None:
+    def set_figures_according_to_board(self) -> None:
         """
         Sets the figures.
         :param board: Board
         """
-        for square_id in board.piece_map():
-            figure = board.piece_at(square_id)
+        for square_id in self.board.piece_map():
+            figure = self.board.piece_at(square_id)
             if figure is not None:
                 piece = self.active_pieces.get(square_id)
                 piece.set_chess_position(chess.square_name(square_id))
@@ -63,7 +64,7 @@ class ChessBoardGui:
         # find all pieces that are not on the board anymore
         pieces_to_remove = []
         for square_id in self.active_pieces:
-            if square_id not in board.piece_map():
+            if square_id not in self.board.piece_map():
                 pieces_to_remove.append(square_id)
         # remove them
         for square_id in pieces_to_remove:
@@ -81,6 +82,18 @@ class ChessBoardGui:
                                                self._get_square_coordinates_for_centered_figure(
                                                    chess.square_name(square_id), self.square_size),
                                                self.square_size))
+            for move in self.board.legal_moves:
+                if move.from_square == square_id:
+                    if self.board.piece_at(move.to_square) is None:
+                        self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_NORMAL,
+                                                           self._get_square_coordinates_for_centered_figure(
+                                                               chess.square_name(move.to_square), self.square_size),
+                                                           self.square_size))
+                    else:
+                        self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_ATTACK,
+                                                           self._get_square_coordinates_for_centered_figure(
+                                                               chess.square_name(move.to_square), self.square_size),
+                                                           self.square_size))
 
     def get_figure_by_square_id(self, square_id: int) -> ChessBoardFigure:
         """
@@ -129,15 +142,15 @@ class ChessBoardGui:
         :param old_square_id: Old square id
         :param new_square_id: New square id
         """
+        self.overlays.clear()
         self.active_pieces[new_square_id] = self.active_pieces[old_square_id]
         del self.active_pieces[old_square_id]
 
-    def rotate_board(self, board: chess.Board) -> None:
+    def rotate_board(self) -> None:
         """
         Rotates the board.
         """
         self.board_rotation = not self.board_rotation
-        self.set_figures_according_to_board(board)
         self.overlays.clear()
 
     def draw(self, surface: pygame.Surface) -> None:
