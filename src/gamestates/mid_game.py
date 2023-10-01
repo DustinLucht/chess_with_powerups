@@ -45,6 +45,7 @@ class MidGame(BaseState):
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(
                     float(self.persist[PersistentDataKeys.DIFFICULTY]), ChessColor.BLACK)
             else:
+                board_gui.rotate_board(board)
                 self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(
                     float(self.persist[PersistentDataKeys.DIFFICULTY]), ChessColor.WHITE)
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn("Player 1", ChessColor.BLACK)

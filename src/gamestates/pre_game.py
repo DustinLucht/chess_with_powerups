@@ -16,10 +16,10 @@ class PreGame(BaseState):
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
 
         # UI Elemente
-        self.textbox_single_player_render: pygame.Surface = self.font.render("Mehrspieler: Aus", True, (255, 255, 255))
-        self.toggle_single_player: Toggle = Toggle(pygame.display.get_surface(), 1000, 100, 200, 40,
-                                                   fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
-                                                   handleColour=(150, 150, 150), handleRadius=18, initial=True)
+        self.textbox_multiplayer_render: pygame.Surface = self.font.render("Mehrspieler: Aus", True, (255, 255, 255))
+        self.toggle_multiplayer: Toggle = Toggle(pygame.display.get_surface(), 1000, 100, 200, 40,
+                                                 fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
+                                                 handleColour=(150, 150, 150), handleRadius=18, initial=True)
         self.textbox_starts_render: pygame.Surface = self.font.render("Du spielst als: weiß", True, (255, 255, 255))
         self.toggle_playing_as: Toggle = Toggle(pygame.display.get_surface(), 1000, 250, 200, 40,
                                                 fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
@@ -42,12 +42,7 @@ class PreGame(BaseState):
                                    inactiveColour=(141, 185, 244), pressedColour=(50, 50, 255), radius=20,
                                    hoverColour=(100, 100, 255),
                                    onRelease=self.handle_action, onReleaseParams=["Start"])
-
-        self.single_player: bool = True
-        self.difficulty: float = 1.0
-        self.start_with_white: bool = True
         self.toggle_playing_as.toggle()
-        self.power_up_multiplier: int = 1
 
     def startup(self, persistent):
         super(PreGame, self).startup(persistent)
@@ -61,8 +56,8 @@ class PreGame(BaseState):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)
 
-        surface.blit(self.textbox_single_player_render, (1000, 50))
-        self.toggle_single_player.draw()
+        surface.blit(self.textbox_multiplayer_render, (1000, 50))
+        self.toggle_multiplayer.draw()
         surface.blit(self.textbox_starts_render, (1000, 200))
         self.toggle_playing_as.draw()
         surface.blit(self.textbox_difficulty_render, (1000, 350))
@@ -77,8 +72,8 @@ class PreGame(BaseState):
             self.quit = True
 
     def update(self, dt):
-        self.textbox_single_player_render = self.get_text_render(
-            f"Mehrspieler:  {'An' if self.toggle_single_player.getValue() else 'Aus'}")
+        self.textbox_multiplayer_render = self.get_text_render(
+            f"Mehrspieler:  {'An' if self.toggle_multiplayer.getValue() else 'Aus'}")
         self.textbox_starts_render = self.get_text_render(
             f"Du spielst als:  {'weiß' if self.toggle_playing_as.getValue() else 'schwarz'}")
         self.textbox_difficulty_render = self.get_text_render(
@@ -110,7 +105,7 @@ class PreGame(BaseState):
         """
         Starts the game.
         """
-        self.persist[PersistentDataKeys.SINGLE_PLAYER] = self.toggle_single_player.getValue()
-        self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.start_with_white
+        self.persist[PersistentDataKeys.SINGLE_PLAYER] = not self.toggle_multiplayer.getValue()
+        self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.toggle_playing_as.getValue()
         self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue()
         self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()
