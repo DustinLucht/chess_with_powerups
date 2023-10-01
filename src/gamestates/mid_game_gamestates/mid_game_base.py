@@ -1,9 +1,11 @@
 """
 This module contains the base state.
 """
+import chess
 import pygame
 
 from src.enums import MidGamePersistentDataKeys, MidGameState
+from src.mid_game.chess_board_gui import ChessBoardGui
 
 
 class MidGameBaseState(object):
@@ -17,6 +19,12 @@ class MidGameBaseState(object):
         self.screen_rect: pygame.Rect = pygame.display.get_surface().get_rect()
         self.mid_game_persist: dict[MidGamePersistentDataKeys, object] = {}
         self.font: pygame.font.Font = pygame.font.Font(None, 24)
+        # init board
+        self.board: chess.Board = chess.Board()
+        self.board_gui: ChessBoardGui = ChessBoardGui(self.board, 0, 0)
+        # init background
+        self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
+        self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
 
     def startup(self, mid_game_persistent: dict) -> None:
         """

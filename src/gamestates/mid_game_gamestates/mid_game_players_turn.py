@@ -12,16 +12,10 @@ from src.mid_game.player import Player
 class MidGamePlayersTurn(MidGameBaseState):
     def __init__(self, players_name: str, players_color: ChessColor):
         super(MidGamePlayersTurn, self).__init__()
-        # init board
-        self.board: chess.Board = chess.Board()
-        self.board_gui: ChessBoardGui = ChessBoardGui(self.board, 0, 0)
         # init vars
         self.is_figure_dragging: bool = False
         self.id_figure_dragging: int = 0
         self.player: Player = Player(players_name, players_color)
-        # init background
-        self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
-        self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
 
     def startup(self, mid_game_persistent):
         super(MidGamePlayersTurn, self).startup(mid_game_persistent)

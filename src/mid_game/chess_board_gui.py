@@ -84,6 +84,13 @@ class ChessBoardGui:
         self.active_pieces[new_square_id] = self.active_pieces[old_square_id]
         del self.active_pieces[old_square_id]
 
+    def rotate_board(self, board: chess.Board) -> None:
+        """
+        Rotates the board.
+        """
+        self.board_rotation = not self.board_rotation
+        self.set_figures_according_to_board(board)
+
     def draw_chessboard(self, surface: pygame.Surface) -> None:
         """
         Creates a chessboard.
@@ -157,7 +164,6 @@ class ChessBoardGui:
         """
         name = self.get_correlating_square_name_or_none(pos)
         if name not in self.chess_field_name_to_index:
-            print(f"get_correlating_square_id_or_none {name} from pos {pos} not in CHESS_FIELD_NAME_TO_INDEX")
             return None
         return self.chess_field_name_to_index[name]
 

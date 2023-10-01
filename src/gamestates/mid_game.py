@@ -19,9 +19,6 @@ PIECES_SIZE = 0.7
 class MidGame(BaseState):
     def __init__(self):
         super(MidGame, self).__init__()
-        # init board
-        self.board: chess.Board = chess.Board()
-        self.board_gui: ChessBoardGui = ChessBoardGui(self.board, SQUARE_SIZE, PIECES_SIZE)
         # init states
         self.mid_game_states: dict[MidGameState, MidGameBaseState] = {MidGameState.PAUSE: MidGamePause()}
         self.mid_game_state_name: MidGameState = MidGameState.PAUSE
@@ -29,12 +26,15 @@ class MidGame(BaseState):
         # background
         self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        # quick dirty button
+        self.button = pygame.Rect(1500, 10, 100, 50)
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
         # init board
-        self.board = chess.Board()
-        self.board_gui.set_figures_according_to_board(self.board)
+        board: chess.Board = chess.Board()
+        board_gui: ChessBoardGui = ChessBoardGui(board, SQUARE_SIZE, PIECES_SIZE)
+        board_gui.set_figures_according_to_board(board)
         # init background
         self.background_image = persistent[PersistentDataKeys.BACKGROUND_IMAGE]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
@@ -58,8 +58,8 @@ class MidGame(BaseState):
         self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         # set data and start
         mid_game_persist = {
-            MidGamePersistentDataKeys.BOARD: self.board,
-            MidGamePersistentDataKeys.BOARD_GUI: self.board_gui,
+            MidGamePersistentDataKeys.BOARD: board,
+            MidGamePersistentDataKeys.BOARD_GUI: board_gui,
             MidGamePersistentDataKeys.BACKGROUND_IMAGE: self.background_image,
             MidGamePersistentDataKeys.CURRENT_TURN: self.mid_game_state_name
         }
@@ -80,7 +80,7 @@ class MidGame(BaseState):
     def get_event(self, event):
         if event.type == pygame.QUIT:
             self.quit = True
-        if event.type == pygame.KEYUP:
+        elif event.type == pygame.KEYUP:
             if event.key == pygame.K_ESCAPE:
                 # resume game
                 if self.mid_game_state_name == MidGameState.PAUSE:
@@ -91,6 +91,11 @@ class MidGame(BaseState):
                 else:
                     self.mid_game_state.next_state = MidGameState.PAUSE
                     self.flip_state()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if event.button == 1:
+                # check button
+                if self.button.collidepoint(event.pos):
+                    self.mid_game_state.board_gui.rotate_board(self.mid_game_state.board)
         self.mid_game_state.get_event(event)
 
     def update(self, dt):
@@ -102,3 +107,4 @@ class MidGame(BaseState):
 
     def draw(self, surface):
         self.mid_game_state.draw(surface)
+        pygame.draw.rect(surface, pygame.Color("red"), self.button)
