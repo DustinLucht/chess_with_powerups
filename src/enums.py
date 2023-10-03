@@ -41,6 +41,10 @@ class OverlayType(Enum):
     SELECTED_FIGURE = 0
     POSSIBLE_MOVE_NORMAL = 1
     POSSIBLE_MOVE_ATTACK = 2
+    PROMOTION_QUEEN = 3
+    PROMOTION_ROOK = 4
+    PROMOTION_BISHOP = 5
+    PROMOTION_KNIGHT = 6
 
 
 class ChessColor(Enum):

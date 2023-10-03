@@ -4,9 +4,10 @@ This module represents the chess board gui.
 import chess
 import pygame
 
-from src.enums import OverlayType
+from config.globals import CHESS_BOARD_COLORS
+from src.enums import OverlayType, ChessColor
 from src.mid_game.chess_board_figure import ChessBoardFigure
-from src.mid_game.square_overlay import SquareOverlay
+from src.mid_game.square_overlays import SquareOverlay, SquareOverlayMove, SquareOverlayPromotion
 
 PIECES = {
     "b": "b_bishop_png_1024px.png",
@@ -93,23 +94,64 @@ class ChessBoardGui:
         self.overlays.clear()
 
         # add the selected figure overlay
-        self.overlays.append(SquareOverlay(OverlayType.SELECTED_FIGURE,
-                                           self._get_square_coordinates_for_centered_figure(
-                                               chess.square_name(square_id), self.square_size),
-                                           self.square_size, square_id))
+        self.overlays.append(SquareOverlayMove(OverlayType.SELECTED_FIGURE,
+                                               self._get_square_coordinates_for_centered_figure(
+                                                   chess.square_name(square_id), self.square_size),
+                                               self.square_size, square_id))
         # add all possible moves
         for move in self.board.legal_moves:
             if move.from_square == square_id:
                 if self.board.piece_at(move.to_square) is None:
-                    self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_NORMAL,
-                                                       self._get_square_coordinates_for_centered_figure(
-                                                           chess.square_name(move.to_square), self.square_size),
-                                                       self.square_size, move.to_square))
+                    self.overlays.append(SquareOverlayMove(OverlayType.POSSIBLE_MOVE_NORMAL,
+                                                           self._get_square_coordinates_for_centered_figure(
+                                                               chess.square_name(move.to_square), self.square_size),
+                                                           self.square_size, move.to_square))
                 else:
-                    self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_ATTACK,
-                                                       self._get_square_coordinates_for_centered_figure(
-                                                           chess.square_name(move.to_square), self.square_size),
-                                                       self.square_size, move.to_square))
+                    self.overlays.append(SquareOverlayMove(OverlayType.POSSIBLE_MOVE_ATTACK,
+                                                           self._get_square_coordinates_for_centered_figure(
+                                                               chess.square_name(move.to_square), self.square_size),
+                                                           self.square_size, move.to_square))
+
+    def set_peasant_promotion_overlay(self, square_id: int, player_color: ChessColor) -> None:
+        """
+        Sets the selected square.
+        :param square_id: Square id
+        :param player_color: Player color
+        """
+        # init
+        current_center_pos = self._get_square_coordinates_for_centered_figure(chess.square_name(square_id),
+                                                                              self.square_size)
+        all_promotion_figures = ["Q", "R", "B", "N"] if player_color == ChessColor.WHITE else ["q", "r", "b", "n"]
+        figure_to_promotion_enum = {"Q": OverlayType.PROMOTION_QUEEN, "R": OverlayType.PROMOTION_ROOK,
+                                    "B": OverlayType.PROMOTION_BISHOP, "N": OverlayType.PROMOTION_KNIGHT,
+                                    "q": OverlayType.PROMOTION_QUEEN, "r": OverlayType.PROMOTION_ROOK,
+                                    "b": OverlayType.PROMOTION_BISHOP, "n": OverlayType.PROMOTION_KNIGHT}
+        for promotion_figure in all_promotion_figures:
+            # add the selected figure overlay
+            self.overlays.append(
+                SquareOverlayPromotion(figure_to_promotion_enum[promotion_figure], current_center_pos, self.square_size,
+                                       square_id, f"..\\assets\\images\\pieces\\{PIECES[promotion_figure]}"))
+            current_center_pos = (current_center_pos[0], current_center_pos[1] + self.square_size)
+
+    def set_figure_to_square(self, square_id: int, player_color: ChessColor, selected_promotion: OverlayType) -> None:
+        """
+        Sets the figure to the square.
+        :param square_id: Square id
+        :param player_color: Player color
+        :param selected_promotion: Selected promotion
+        """
+        # transform chess color and overlay type to a figure str
+        figure_str = "Q" if player_color == ChessColor.WHITE else "q"
+        if selected_promotion == OverlayType.PROMOTION_ROOK:
+            figure_str = "R" if player_color == ChessColor.WHITE else "r"
+        elif selected_promotion == OverlayType.PROMOTION_BISHOP:
+            figure_str = "B" if player_color == ChessColor.WHITE else "b"
+        elif selected_promotion == OverlayType.PROMOTION_KNIGHT:
+            figure_str = "N" if player_color == ChessColor.WHITE else "n"
+        # set the figure
+        self.active_pieces[square_id] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
+                                                         f"..\\assets\\images\\pieces\\{PIECES[figure_str]}",
+                                                         figure_str, chess.square_name(square_id), (0, 0))
 
     def get_figure_by_square_id(self, square_id: int) -> ChessBoardFigure:
         """
@@ -152,7 +194,20 @@ class ChessBoardGui:
             return None
         return self.chess_field_name_to_index[name]
 
-    def is_overlays_selected(self, square_id: int) -> bool:
+    def get_selected_promotion(self, mouse_pos: tuple[int, int]) -> OverlayType or None:
+        """
+        Get the selected promotion.
+        :param mouse_pos: Mouse position
+        :return: Selected promotion or None
+        """
+        for overlay in self.overlays:
+            if overlay.overlay_type in [OverlayType.PROMOTION_QUEEN, OverlayType.PROMOTION_ROOK,
+                                        OverlayType.PROMOTION_BISHOP, OverlayType.PROMOTION_KNIGHT]:
+                if overlay.overlay_rect.collidepoint(mouse_pos):
+                    return overlay.overlay_type
+        return None
+
+    def is_a_overlay_selected(self, square_id: int) -> bool:
         """
         Checks if the overlays are selected.
         :param square_id: Square id
@@ -160,6 +215,17 @@ class ChessBoardGui:
         """
         for overlay in self.overlays:
             if overlay.square_id == square_id:
+                return True
+        return False
+
+    def is_a_overlay_selected_promotion_dialog(self, mouse_pos: tuple[int, int]) -> bool:
+        """
+        Checks if the overlays are selected.
+        :param mouse_pos: Mouse position
+        :return: True if selected, False otherwise
+        """
+        for overlay in self.overlays:
+            if overlay.overlay_rect.collidepoint(mouse_pos):
                 return True
         return False
 
@@ -203,10 +269,9 @@ class ChessBoardGui:
         Creates a chessboard.
         :param surface: Surface to draw on
         """
-        colors = [(255, 206, 158), (209, 139, 71)]
         for row in range(8):
             for col in range(8):
-                color = colors[(row + col) % 2]
+                color = CHESS_BOARD_COLORS[(row + col) % 2]
 
                 if self.board_rotation:
                     rect = pygame.Rect(col * self.square_size, row * self.square_size, self.square_size,
