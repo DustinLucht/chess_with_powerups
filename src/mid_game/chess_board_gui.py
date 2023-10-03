@@ -31,11 +31,13 @@ class ChessBoardGui:
 
     def __init__(self, board: chess.Board, square_size: int, pieces_size_multiplier: float,
                  board_rotation: bool = False):
+        # init vars
         self.board: chess.Board = board
         self.square_size: int = square_size
         self.pieces_size_multiplier: float = pieces_size_multiplier
         self.board_rotation: bool = board_rotation
         self.active_pieces: dict[int, ChessBoardFigure] = {}
+        # init figures
         for square_id in board.piece_map():
             figure = board.piece_at(square_id)
             if figure is not None:
@@ -44,7 +46,9 @@ class ChessBoardGui:
                                                                  f"{PIECES[str(figure)]}",
                                                                  str(figure), chess.square_name(square_id),
                                                                  (0, 0))
+        # init overlays
         self.overlays: list[SquareOverlay] = []
+        # init chess field name to index
         self.chess_field_name_to_index = {f"{chr(97 + x)}{y + 1}": x + y * 8 for x in range(8) for y in range(8)}
         self.chess_index_to_field_name = {v: k for k, v in self.chess_field_name_to_index.items()}
 
@@ -78,30 +82,32 @@ class ChessBoardGui:
                     piece.set_cord_position(
                         (self._get_square_coordinates_for_centered_figure(chess.square_name(square_id), piece.size)))
 
-    def set_selected_square(self, mouse_pos: tuple[int, int]) -> None:
+    def set_selected_square(self, square_id: int) -> None:
         """
         Sets the selected square.
-        :param mouse_pos: Position of the mouse
+        :param square_id: Square id
         """
+        # clean all overlays
         self.overlays.clear()
-        square_id = self.get_correlating_square_id_or_none(mouse_pos)
-        if square_id is not None:
-            self.overlays.append(SquareOverlay(OverlayType.SELECTED_FIGURE,
-                                               self._get_square_coordinates_for_centered_figure(
-                                                   chess.square_name(square_id), self.square_size),
-                                               self.square_size))
-            for move in self.board.legal_moves:
-                if move.from_square == square_id:
-                    if self.board.piece_at(move.to_square) is None:
-                        self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_NORMAL,
-                                                           self._get_square_coordinates_for_centered_figure(
-                                                               chess.square_name(move.to_square), self.square_size),
-                                                           self.square_size))
-                    else:
-                        self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_ATTACK,
-                                                           self._get_square_coordinates_for_centered_figure(
-                                                               chess.square_name(move.to_square), self.square_size),
-                                                           self.square_size))
+
+        # add the selected figure overlay
+        self.overlays.append(SquareOverlay(OverlayType.SELECTED_FIGURE,
+                                           self._get_square_coordinates_for_centered_figure(
+                                               chess.square_name(square_id), self.square_size),
+                                           self.square_size, square_id))
+        # add all possible moves
+        for move in self.board.legal_moves:
+            if move.from_square == square_id:
+                if self.board.piece_at(move.to_square) is None:
+                    self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_NORMAL,
+                                                       self._get_square_coordinates_for_centered_figure(
+                                                           chess.square_name(move.to_square), self.square_size),
+                                                       self.square_size, move.to_square))
+                else:
+                    self.overlays.append(SquareOverlay(OverlayType.POSSIBLE_MOVE_ATTACK,
+                                                       self._get_square_coordinates_for_centered_figure(
+                                                           chess.square_name(move.to_square), self.square_size),
+                                                       self.square_size, move.to_square))
 
     def get_figure_by_square_id(self, square_id: int) -> ChessBoardFigure:
         """
@@ -133,7 +139,7 @@ class ChessBoardGui:
 
         return f"{chr(97 + x)}{8 - y}"
 
-    def get_correlating_square_id_or_none(self, pos: tuple) -> str or None:
+    def get_correlating_square_id_or_none(self, pos: tuple) -> int or None:
         """
         Get the correlating square id or None if not found.
         :param pos: Position of the mouse
@@ -143,6 +149,28 @@ class ChessBoardGui:
         if name not in self.chess_field_name_to_index:
             return None
         return self.chess_field_name_to_index[name]
+
+    def is_overlays_selected(self, square_id: int) -> bool:
+        """
+        Checks if the overlays are selected.
+        :param square_id: Square id
+        :return: True if selected, False otherwise
+        """
+        for overlay in self.overlays:
+            if overlay.square_id == square_id:
+                return True
+        return False
+
+    def is_overlay_selected_figure(self, square_id: int) -> bool:
+        """
+        Checks if the overlay is selected.
+        :param square_id: Square id
+        :return: True if selected, False otherwise
+        """
+        for overlay in self.overlays:
+            if overlay.overlay_type == OverlayType.SELECTED_FIGURE and overlay.square_id == square_id:
+                return True
+        return False
 
     def move_figure_and_del_old(self, old_square_id: int, new_square_id: int) -> None:
         """

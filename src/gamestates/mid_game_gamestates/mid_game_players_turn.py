@@ -69,7 +69,7 @@ class MidGamePlayersTurn(MidGameBaseState):
                     figure = self.board_gui.get_figure_by_square_id(square_id)
                     figure.set_dragging(True)
                     figure.set_cord_position_to_center(mouse_pos)
-                    self.board_gui.set_selected_square(mouse_pos)
+                    self.board_gui.set_selected_square(square_id)
 
     def handle_short_mousebuttondown(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -78,10 +78,16 @@ class MidGamePlayersTurn(MidGameBaseState):
         :return: None
         """
         square_id = self.board_gui.get_correlating_square_id_or_none(mouse_pos)
+        # square is not None
         if square_id is not None:
-            if self.board.piece_at(square_id) is not None:
+            # check if overlays are selected
+            if self.board_gui.is_overlays_selected(square_id):
+                self.handle_overlay_selected(square_id)
+            # check if figure is selected
+            elif self.board.piece_at(square_id) is not None:
                 if self.board.piece_at(square_id).color == self.player.color.value:
-                    self.board_gui.set_selected_square(mouse_pos)
+                    self.id_figure_selected = square_id
+                    self.board_gui.set_selected_square(square_id)
 
     def handle_dragging_figure(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -107,6 +113,17 @@ class MidGamePlayersTurn(MidGameBaseState):
             self.move_figure(figure, new_square_id)
         else:
             self.board_gui.set_figures_according_to_board()
+
+    def handle_overlay_selected(self, square_id: int) -> None:
+        """
+        Handles the selection of an overlay.
+        :param square_id: Square id
+        :return: None
+        """
+        figure = self.board_gui.get_figure_by_square_id(self.id_figure_selected)
+        if self.board_gui.is_overlay_selected_figure(square_id):
+            return
+        self.move_figure(figure, square_id)
 
     def move_figure(self, figure: ChessBoardFigure, to_square_id: int) -> None:
         """

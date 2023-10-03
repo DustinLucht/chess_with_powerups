@@ -17,7 +17,8 @@ class SquareOverlay:
     """
     Base class for all overlays.
     """
-    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int):
+    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int):
+        self.square_id: int = square_id
         self.overlay_type: OverlayType = overlay_type
         self.overlay_color = COLOR_SCHEME[overlay_type]
         x, y = center_pos
