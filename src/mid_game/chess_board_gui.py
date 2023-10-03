@@ -81,6 +81,8 @@ class ChessBoardGui:
                 if not piece.is_dragging():
                     piece.set_cord_position(
                         (self._get_square_coordinates_for_centered_figure(chess.square_name(square_id), piece.size)))
+        # clean all overlays
+        self.overlays.clear()
 
     def set_selected_square(self, square_id: int) -> None:
         """
@@ -178,7 +180,6 @@ class ChessBoardGui:
         :param old_square_id: Old square id
         :param new_square_id: New square id
         """
-        self.overlays.clear()
         self.active_pieces[new_square_id] = self.active_pieces[old_square_id]
         del self.active_pieces[old_square_id]
 
@@ -187,7 +188,6 @@ class ChessBoardGui:
         Rotates the board.
         """
         self.board_rotation = not self.board_rotation
-        self.overlays.clear()
 
     def draw(self, surface: pygame.Surface) -> None:
         """

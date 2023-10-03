@@ -110,7 +110,16 @@ class MidGamePlayersTurn(MidGameBaseState):
         figure.set_dragging(False)
         self.is_figure_dragging = False
         if self.id_figure_selected != new_square_id:
-            self.move_figure(figure, new_square_id)
+            # check if new square is one of the possible moves
+            if self.board_gui.is_overlay_selected_figure(new_square_id):
+                # check if it is the same color
+                if self.board_gui.is_overlay_selected_figure(new_square_id):
+                    self.board_gui.set_figures_according_to_board()
+                    return
+                # else it is an possible move
+                self.move_figure(figure, new_square_id)
+            else:
+                self.board_gui.set_figures_according_to_board()
         else:
             self.board_gui.set_figures_according_to_board()
 
