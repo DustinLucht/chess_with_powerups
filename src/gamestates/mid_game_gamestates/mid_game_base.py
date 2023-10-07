@@ -4,7 +4,7 @@ This module contains the base state.
 import chess
 import pygame
 
-from src.enums import MidGamePersistentDataKeys, MidGameState
+from src.enums import MidGamePersistentDataKeys, MidGameState, ChessColor
 from src.mid_game.chess_board_gui import ChessBoardGui
 
 
@@ -12,7 +12,7 @@ class MidGameBaseState(object):
     """
     This class represents the base state.
     """
-    def __init__(self) -> None:
+    def __init__(self, color: ChessColor) -> None:
         self.done: bool = False
         self.quit: bool = False
         self.next_state: MidGameState = MidGameState.PAUSE
@@ -25,6 +25,8 @@ class MidGameBaseState(object):
         # init background
         self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        # vars
+        self.color: ChessColor = color
 
     def startup(self, mid_game_persistent: dict) -> None:
         """

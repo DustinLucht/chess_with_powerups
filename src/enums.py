@@ -29,11 +29,15 @@ class PersistentDataKeys(Enum):
     STARTS_WITH_WHITE = 2
     DIFFICULTY = 3
     POWER_UP_MULTIPLICATOR = 4
+    OUTCOME = 5
 
 
 class MidGamePersistentDataKeys(Enum):
     """Enum for the different keys of the persistent data."""
     CURRENT_TURN = 0
+    DRAW_OFFERED = 1
+    DRAW_ACCEPTED = 2
+    FORFEIT = 3
 
 
 class OverlayType(Enum):

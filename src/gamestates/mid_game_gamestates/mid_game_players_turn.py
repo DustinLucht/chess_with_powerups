@@ -11,12 +11,12 @@ from src.mid_game.player import Player
 
 
 class MidGamePlayersTurn(MidGameBaseState):
-    def __init__(self, players_name: str, players_color: ChessColor, board: chess.Board, board_gui: ChessBoardGui):
-        super(MidGamePlayersTurn, self).__init__()
+    def __init__(self, color: ChessColor, players_name: str, board: chess.Board, board_gui: ChessBoardGui):
+        super(MidGamePlayersTurn, self).__init__(color)
         # init vars
         self.is_figure_dragging: bool = False
         self.id_square_selected: int = 0
-        self.player: Player = Player(players_name, players_color)
+        self.player: Player = Player(players_name, color)
         self.time_clicked: float = 0
         self.button_down: bool = False
         self.wait_for_separate_player_input: bool = False

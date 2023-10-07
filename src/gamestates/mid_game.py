@@ -20,7 +20,7 @@ class MidGame(BaseState):
     def __init__(self):
         super(MidGame, self).__init__()
         # init states
-        self.mid_game_states: dict[MidGameState, MidGameBaseState] = {MidGameState.PAUSE: MidGamePause()}
+        self.mid_game_states: dict[MidGameState, MidGameBaseState] = {MidGameState.PAUSE: MidGamePause(ChessColor.BLACK)}
         self.mid_game_state_name: MidGameState = MidGameState.PAUSE
         self.mid_game_state: MidGameBaseState = self.mid_game_states[self.mid_game_state_name]
         # background
@@ -37,27 +37,27 @@ class MidGame(BaseState):
         self.background_image = persistent[PersistentDataKeys.BACKGROUND_IMAGE]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
         # init states
-        self.mid_game_states = {MidGameState.PAUSE: MidGamePause()}
+        self.mid_game_states = {MidGameState.PAUSE: MidGamePause(ChessColor.BLACK)}
         # single player
         if self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             # start with white
             if self.persist[PersistentDataKeys.STARTS_WITH_WHITE]:
-                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn("Player 1", ChessColor.WHITE,
+                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE,"Player 1",
                                                                                        board, board_gui)
-                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(
-                    float(self.persist[PersistentDataKeys.DIFFICULTY]), ChessColor.BLACK, board, board_gui)
+                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(ChessColor.BLACK,
+                    float(self.persist[PersistentDataKeys.DIFFICULTY]), board, board_gui)
             # start with black
             else:
                 board_gui.rotate_board()
-                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(
-                    float(self.persist[PersistentDataKeys.DIFFICULTY]), ChessColor.WHITE, board, board_gui)
-                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn("Player 1", ChessColor.BLACK,
+                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(ChessColor.WHITE,
+                    float(self.persist[PersistentDataKeys.DIFFICULTY]), board, board_gui)
+                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK,"Player 1",
                                                                                        board, board_gui)
         # multi player
         else:
-            self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn("Player 1", ChessColor.WHITE, board,
+            self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE, "Player 1", board,
                                                                                    board_gui)
-            self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn("Player 2", ChessColor.BLACK, board,
+            self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 2", board,
                                                                                    board_gui)
         # set first state
         self.mid_game_state_name = MidGameState.PLAYERS_1_TURN
@@ -121,8 +121,53 @@ class MidGame(BaseState):
         # rotate board
         if not self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             self.mid_game_state.board_gui.rotate_board()
+
         # check if game is over
-        if self.mid_game_state.board.is_game_over():
+        outcome = self.mid_game_state.board.outcome()
+        if outcome is not None:
+            self.persist[PersistentDataKeys.OUTCOME] = outcome
             self.next_state = GameState.POST_GAME
             self.done = True
 
+        # check forfeit
+        if self._get_mid_game_persist(MidGamePersistentDataKeys.FORFEIT):
+            self.persist[PersistentDataKeys.OUTCOME] = chess.Outcome(chess.Termination.VARIANT_LOSS,
+                                                                     self.mid_game_state.color.value)
+            self.next_state = GameState.POST_GAME
+            self.done = True
+
+        # check old draw offer
+        draw_offered = self._get_mid_game_persist(MidGamePersistentDataKeys.DRAW_OFFERED)
+        draw_accepted = self._get_mid_game_persist(MidGamePersistentDataKeys.DRAW_ACCEPTED)
+        current_player_color = self.mid_game_state.color
+        if draw_offered != current_player_color and not draw_accepted:
+            self._set_mid_game_persist(MidGamePersistentDataKeys.DRAW_OFFERED, None)
+        # normal draw between two players
+        elif draw_offered != current_player_color and draw_accepted:
+            self.persist[PersistentDataKeys.OUTCOME] = chess.Outcome(chess.Termination.VARIANT_DRAW, None)
+            self.next_state = GameState.POST_GAME
+            self.done = True
+        # draw claimed
+        elif not draw_offered and draw_accepted:
+            self.persist[PersistentDataKeys.OUTCOME] = chess.Outcome(chess.Termination.VARIANT_DRAW, None)
+            self.next_state = GameState.POST_GAME
+            self.done = True
+
+    def _set_mid_game_persist(self, key: MidGamePersistentDataKeys, value: object) -> None:
+        """
+        Sets the mid_game_persist.
+        :param key: key
+        :param value: value
+        :return: None
+        """
+        self.mid_game_state.mid_game_persist[key] = value
+
+    def _get_mid_game_persist(self, key: MidGamePersistentDataKeys) -> object:
+        """
+        Gets the mid_game_persist.
+        :param key: key
+        :return: value
+        """
+        if key not in self.mid_game_state.mid_game_persist:
+            return None
+        return self.mid_game_state.mid_game_persist[key]
