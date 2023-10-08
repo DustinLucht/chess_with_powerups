@@ -97,7 +97,7 @@ class MidGame(BaseState):
         if self.mid_game_state.quit:
             self.done = True
         elif self.mid_game_state.done:
-            self.checks_between_moves()
+            self._checks_between_moves()
             self.flip_state()
         self.mid_game_state.update(dt)
 
@@ -118,7 +118,7 @@ class MidGame(BaseState):
         self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         self.mid_game_state.startup(mid_game_persist)
 
-    def checks_between_moves(self) -> None:
+    def _checks_between_moves(self) -> None:
         """
         Checks if the game is over or if the next player is in check.
         """

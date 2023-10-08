@@ -6,7 +6,7 @@ import pygame
 from src.enums import GameState, PersistentDataKeys
 
 
-class BaseState(object):
+class BaseState:
     """
     This class represents the base state.
     """
@@ -25,7 +25,7 @@ class BaseState(object):
         self.next_state = GameState.MENU
         self.screen_rect = pygame.display.get_surface().get_rect()
         self.persist = {}
-        self.font: pygame.font.Font(None, 24)
+        self.font: pygame.font.Font(None, 24) = pygame.font.Font(None, 45)
         self.background_image = pygame.Surface(self.screen_rect.size)
         self.background_rect = self.background_image.get_rect(center=self.screen_rect.center)
 

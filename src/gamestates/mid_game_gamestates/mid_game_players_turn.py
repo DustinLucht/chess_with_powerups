@@ -70,6 +70,40 @@ class MidGamePlayersTurn(MidGameBaseState):
             self._handle_long_mousebuttondown(pygame.mouse.get_pos())
             self.button_down = False
 
+    def handle_peasant_promotion(self, mouse_pos: tuple[int, int]) -> None:
+        """
+        Handles the peasant promotion.
+        :param mouse_pos: Position of the mouse
+        :return: None
+        """
+        if self.board_gui.is_a_overlay_selected_promotion_dialog(mouse_pos):
+            selected_promotion = self.board_gui.get_selected_promotion(mouse_pos)
+            to_square_id = self.id_square_selected + 8 if self.player.color == ChessColor.WHITE else \
+                self.id_square_selected - 8
+            if not selected_promotion:
+                return
+            elif selected_promotion == OverlayType.PROMOTION_QUEEN:
+                self.board.push(chess.Move.from_uci(
+                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
+                    f"{chess.square_name(to_square_id)}q"))
+            elif selected_promotion == OverlayType.PROMOTION_ROOK:
+                self.board.push(chess.Move.from_uci(
+                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
+                    f"{chess.square_name(to_square_id)}r"))
+            elif selected_promotion == OverlayType.PROMOTION_BISHOP:
+                self.board.push(chess.Move.from_uci(
+                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
+                    f"{chess.square_name(to_square_id)}b"))
+            elif selected_promotion == OverlayType.PROMOTION_KNIGHT:
+                self.board.push(chess.Move.from_uci(
+                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
+                    f"{chess.square_name(to_square_id)}n"))
+            self.wait_for_separate_player_input = False
+            self.id_square_selected = -1
+            self.board_gui.set_figure_to_square(self.id_square_selected, self.player.color, selected_promotion)
+            self.board_gui.set_figures_according_to_board()
+            self.done = True
+
     def _check_for_peasant_promotion(self, to_square_id: int) -> bool:
         """
         Checks if the peasant is on the last row.
@@ -173,40 +207,6 @@ class MidGamePlayersTurn(MidGameBaseState):
         """
         self.board_gui.set_peasant_promotion_overlay(to_square_id, self.player.color)
         self.wait_for_separate_player_input = True
-
-    def handle_peasant_promotion(self, mouse_pos: tuple[int, int]) -> None:
-        """
-        Handles the peasant promotion.
-        :param mouse_pos: Position of the mouse
-        :return: None
-        """
-        if self.board_gui.is_a_overlay_selected_promotion_dialog(mouse_pos):
-            selected_promotion = self.board_gui.get_selected_promotion(mouse_pos)
-            to_square_id = self.id_square_selected + 8 if self.player.color == ChessColor.WHITE else \
-                self.id_square_selected - 8
-            if not selected_promotion:
-                return
-            elif selected_promotion == OverlayType.PROMOTION_QUEEN:
-                self.board.push(chess.Move.from_uci(
-                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
-                    f"{chess.square_name(to_square_id)}q"))
-            elif selected_promotion == OverlayType.PROMOTION_ROOK:
-                self.board.push(chess.Move.from_uci(
-                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
-                    f"{chess.square_name(to_square_id)}r"))
-            elif selected_promotion == OverlayType.PROMOTION_BISHOP:
-                self.board.push(chess.Move.from_uci(
-                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
-                    f"{chess.square_name(to_square_id)}b"))
-            elif selected_promotion == OverlayType.PROMOTION_KNIGHT:
-                self.board.push(chess.Move.from_uci(
-                    f"{self.board_gui.get_figure_by_square_id(self.id_square_selected).chess_position}"
-                    f"{chess.square_name(to_square_id)}n"))
-            self.wait_for_separate_player_input = False
-            self.id_square_selected = -1
-            self.board_gui.set_figure_to_square(self.id_square_selected, self.player.color, selected_promotion)
-            self.board_gui.set_figures_according_to_board()
-            self.done = True
 
     def _move_figure(self, figure: ChessBoardFigure, to_square_id: int) -> None:
         """

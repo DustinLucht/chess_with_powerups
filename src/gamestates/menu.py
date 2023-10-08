@@ -15,8 +15,8 @@ class Menu(BaseState):
 
     def __init__(self):
         super(Menu, self).__init__()
-        self.active_index: int = 0
-        self.options: dict[int, str] = {0: "Spiel starten", 1: "Optionen", 2: "Quit Game"}
+        self.active_index = 0
+        self.options = {0: "Spiel starten", 1: "Optionen", 2: "Quit Game"}
         self.next_state = GameState.PRE_GAME
         self.font = pygame.font.Font(None, 45)
 

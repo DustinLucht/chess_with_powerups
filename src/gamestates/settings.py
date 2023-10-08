@@ -3,7 +3,7 @@ Settings game state
 """
 import pygame
 
-from base import BaseState
+from .base import BaseState
 from ..enums import GameState
 
 

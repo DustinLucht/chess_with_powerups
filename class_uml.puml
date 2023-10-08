@@ -1,27 +1,347 @@
 @startuml
-'https://plantuml.com/class-diagram
 
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
+namespace enums {
+    enum GameState {
+      SPLASH
+      MENU
+      SETTINGS
+      PRE_GAME
+      MID_GAME
+      PAUSE
+      POST_GAME
+    }
 
-List <|-- AbstractList
-Collection <|-- AbstractCollection
+    enum MidGameState {
+      PLAYERS_1_TURN
+      PLAYERS_2_TURN
+      PAUSE
+    }
 
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
+    enum PersistentDataKeys {
+      BACKGROUND_IMAGE
+      SINGLE_PLAYER
+      STARTS_WITH_WHITE
+      DIFFICULTY
+      POWER_UP_MULTIPLICATOR
+      OUTCOME
+    }
 
-class ArrayList {
-Object[] elementData
-size()
+    enum MidGamePersistentDataKeys {
+      CURRENT_TURN
+      DRAW_OFFERED
+      DRAW_ACCEPTED
+      FORFEIT
+    }
+
+    enum OverlayType {
+      SELECTED_FIGURE
+      POSSIBLE_MOVE_NORMAL
+      POSSIBLE_MOVE_ATTACK
+      PROMOTION_QUEEN
+      PROMOTION_ROOK
+      PROMOTION_BISHOP
+      PROMOTION_KNIGHT
+    }
+
+    enum ChessColor {
+      BLACK
+      WHITE
+    }
+
+    enum PowerUpTypes {
+      FREEZE
+      DOUBLE_MOVE
+    }
 }
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
+class Game {
+    - done
+    - screen
+    - clock
+    - fps
+    - states
+    - state_name
+    - state
+    + __init__(screen, states, start_state)
+    + run()
+    - _event_loop()
+    - _flip_state()
+    - _update(dt)
+    - _draw()
 }
+
+namespace gamestates {
+    class BaseState {
+        - done
+        - quit
+        - next_state
+        - screen_rect
+        - persist
+        - font
+        - background_image
+        - background_rect
+        + __init__()
+        + startup(persistent)
+        + get_event(event)
+        + update(dt)
+        + draw(surface)
+    }
+
+    class Menu {
+        - active_index
+        - options
+        + __init__()
+        - _render_text(index)
+        - _get_text_position(text, index)
+        - _decrease_current_index()
+        - _increase_current_index()
+        + startup(persistent)
+        + handle_action()
+        + get_event(event)
+        + draw(surface)
+    }
+
+    class MidGame {
+        - mid_game_states
+        - mid_game_state_name
+        - mid_game_state
+        + __init__()
+        + startup(persistent)
+        + get_event(event)
+        + update(dt)
+        + draw(surface)
+        + flip_state()
+        - checks_between_moves()
+        - _set_mid_game_persist(key, value)
+        - _get_mid_game_persist(key)
+    }
+
+    class PostGame {
+        + __init__()
+        + get_event(event)
+        + draw(surface)
+    }
+
+    class PreGame {
+        - textbox_multiplayer_render
+        - toggle_multiplayer
+        - textbox_starts_render
+        - toggle_playing_as
+        - textbox_difficulty_render
+        - slider_difficulty
+        - textbox_power_up_multiplier
+        - slider_power_up_multiplier
+        - button_back
+        - button_start
+        + __init__()
+        + startup(persistent)
+        + draw(surface)
+        + get_event(event)
+        + update(dt)
+        - _get_text_render(text)
+        - _handle_action(event)
+        - _set_persist()
+    }
+
+    class Settings {
+        + __init__()
+        + get_event(event)
+        + draw(surface)
+    }
+
+    class Splash {
+        - time_active
+        - current_alpha
+        + __init__()
+        + update(dt)
+        + get_event(event)
+        + draw(surface)
+    }
+
+    namespace gamestates.midgame {
+        class MidGameBaseState {
+            - done
+            - quit
+            - next_state
+            - screen_rect
+            - mid_game_persist
+            - font
+            - board
+            - board_gui
+            - background_image
+            - background_rect
+            - color
+            + __init__(color)
+            + startup(mid_game_persistent)
+            + get_event(event)
+            + update(dt)
+            + draw(surface)
+        }
+
+        class MidGameAIsTurn {
+            - ais_strength
+            + __init__(color, ais_strength, board, board_gui)
+            + startup(mid_game_persistent)
+            + get_event(event)
+            + draw(surface)
+            + update(dt)
+        }
+
+        class MidGamePause {
+            + __init__(color)
+            + get_event(event)
+            + draw(surface)
+        }
+
+        class MidGamePlayersTurn {
+            - is_figure_dragging
+            - id_square_selected
+            - player
+            - time_clicked
+            - button_down
+            - wait_for_separate_player_input
+            + __init__(color, players_name, board, board_gui)
+            + startup(mid_game_persistent)
+            + get_event(event)
+            + draw(surface)
+            + update(dt)
+            + handle_peasant_promotion(mouse_pos)
+            - _check_for_peasant_promotion(to_square_id)
+            - _handle_long_mousebuttondown(mouse_pos)
+            - _handle_short_mousebuttondown(mouse_pos)
+            - _handle_dragging_figure(mouse_pos)
+            - _handle_releasing_figure(mouse_pos)
+            - _handle_overlay_selected(square_id)
+            - _handle_peasant_promotion(to_square_id)
+            - _move_figure(figure, to_square_id)
+        }
+    }
+}
+
+namespace midgame {
+    class ChessBoardFigure {
+        - name
+        - size
+        - chess_position
+        - cord_position
+        - dragging
+        - figure
+        + __init__(size, image_path, name, chess_position, cord_position)
+        + __str__()
+        + __repr__()
+        + set_chess_position(chess_position)
+        + set_cord_position(cord_position)
+        + set_cord_position_to_center(cord_position)
+        + draw(surface)
+        + is_dragging()
+        + set_dragging(dragging)
+    }
+
+    ChessBoardGui "1" o-- "n" ChessBoardFigure
+
+    class ChessBoardGui {
+        - board
+        - square_size
+        - pieces_size_multiplier
+        - board_rotation
+        - active_pieces
+        - overlays
+        - chess_field_name_to_index
+        - chess_index_to_field_name
+        + __init__(board, square_size, pieces_size_multiplier, board_rotation)
+        + set_figures_according_to_board()
+        + set_selected_square(square_id)
+        + set_peasant_promotion_overlay(square_id, player_color)
+        + set_figure_to_square(square_id, player_color, selected_promotion)
+        + get_figure_by_square_id(square_id)
+        + get_correlating_square_name_or_none(pos)
+        + get_correlating_square_id_or_none(pos)
+        + get_selected_promotion(mouse_pos)
+        + is_a_overlay_selected(square_id)
+        + is_a_overlay_selected_promotion_dialog(mouse_pos)
+        + is_overlay_selected_figure(square_id)
+        + move_figure_and_del_old(old_square_id, new_square_id)
+        + rotate_board()
+        + draw(surface)
+        - _draw_chessboard(surface)
+        - _draw_figures(surface)
+        - _draw_overlays(surface)
+        - _get_square_coordinates(square_name)
+        - _get_square_coordinates_for_centered_figure(square_name, figure_size)
+    }
+
+    class Player {
+        - name
+        - color
+        - power_ups
+        + __init__(name, color)
+        + get_name()
+        + set_name(name)
+        + use_power_up(power_up)
+    }
+
+    class PowerUp {
+      - power_up_type
+      + __init__(power_up_type)
+      + apply_power_up()
+    }
+
+    class FreezePowerUp {
+      + __init__()
+      + apply_power_up()
+    }
+
+    class DoubleMovePowerUp {
+      + __init__()
+      + apply_power_up()
+    }
+
+    class SquareOverlay {
+      - square_id
+      - overlay_type
+      - center_pos
+      - overlay_rect
+      - overlay_surface
+      + __init__(overlay_type, center_pos, square_size, square_id)
+      + draw(surface)
+    }
+
+    class SquareOverlayMove {
+      - overlay_color
+      + __init__(overlay_type, center_pos, square_size, square_id)
+      + draw(surface)
+    }
+
+    class SquareOverlayPromotion {
+      - image_path
+      + __init__(overlay_type, center_pos, square_size, square_id, image_path)
+      + draw(surface)
+      + _create_overlay_surface_base(square_size)
+      + _update_overlay_with_edges()
+      + _update_overlay_with_figure(square_size)
+    }
+}
+
+' Vererbungenen
+BaseState <|-- Menu
+BaseState <|-- MidGame
+BaseState <|-- PostGame
+BaseState <|-- PreGame
+BaseState <|-- Settings
+BaseState <|-- Splash
+MidGameBaseState <|-- MidGameAIsTurn
+MidGameBaseState <|-- MidGamePause
+MidGameBaseState <|-- MidGamePlayersTurn
+PowerUp <|-- FreezePowerUp
+PowerUp <|-- DoubleMovePowerUp
+SquareOverlay <|-- SquareOverlayMove
+SquareOverlay <|-- SquareOverlayPromotion
+
+' Nutzen
+Game "1" o-- "n" gamestates.BaseState
+midgame.Player "1" o-- "n" midgame.PowerUp
+gamestates.midgame.MidGamePlayersTurn "1" o--  "1" midgame.Player
+gamestates.midgame.MidGameBaseState "1" o-- "1" midgame.ChessBoardGui
+gamestates.MidGame "1" o-- "n" gamestates.midgame.MidGameBaseState
 
 @enduml

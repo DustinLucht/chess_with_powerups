@@ -17,7 +17,7 @@ class Game:
     state_name: GameState
     state: BaseState
 
-    def __init__(self, screen, states, start_state) -> None:
+    def __init__(self, screen: pygame.Surface, states: dict[GameState, BaseState], start_state: GameState) -> None:
         self.done = False
         self.screen = screen
         self.clock = pygame.time.Clock()
@@ -26,7 +26,19 @@ class Game:
         self.state_name = start_state
         self.state = self.states[self.state_name]
 
-    def event_loop(self) -> None:
+    def run(self) -> None:
+        """
+        Runs the game.
+        :return: None
+        """
+        while not self.done:
+            dt = self.clock.tick(self.fps)
+            self._event_loop()
+            self._update(dt)
+            self._draw()
+            pygame.display.update()
+
+    def _event_loop(self) -> None:
         """
         Handles events.
         :return: None
@@ -36,7 +48,7 @@ class Game:
         for event in events:
             self.state.get_event(event)
 
-    def flip_state(self) -> None:
+    def _flip_state(self) -> None:
         """
         Flips the state.
         :return: None
@@ -48,7 +60,7 @@ class Game:
         self.state = self.states[self.state_name]
         self.state.startup(persistent)
 
-    def update(self, dt) -> None:
+    def _update(self, dt: int) -> None:
         """
         Updates the game.
         :param dt:
@@ -57,24 +69,13 @@ class Game:
         if self.state.quit:
             self.done = True
         elif self.state.done:
-            self.flip_state()
+            self._flip_state()
         self.state.update(dt)
 
-    def draw(self) -> None:
+    def _draw(self) -> None:
         """
         Draws the game.
         :return: None
         """
         self.state.draw(self.screen)
 
-    def run(self) -> None:
-        """
-        Runs the game.
-        :return: None
-        """
-        while not self.done:
-            dt = self.clock.tick(self.fps)
-            self.event_loop()
-            self.update(dt)
-            self.draw()
-            pygame.display.update()
