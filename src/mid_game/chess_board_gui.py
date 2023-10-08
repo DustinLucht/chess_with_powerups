@@ -29,15 +29,24 @@ class ChessBoardGui:
     """
     This class represents the chess board gui.
     """
+    board: chess.Board
+    square_size: int
+    pieces_size_multiplier: float
+    board_rotation: bool
+    active_pieces: dict[int, ChessBoardFigure]
+
+    overlays: list[SquareOverlay]
+    chess_field_name_to_inde: dict[str, int]
+    chess_index_to_field_name: dict[int, str]
 
     def __init__(self, board: chess.Board, square_size: int, pieces_size_multiplier: float,
                  board_rotation: bool = False):
         # init vars
-        self.board: chess.Board = board
-        self.square_size: int = square_size
-        self.pieces_size_multiplier: float = pieces_size_multiplier
-        self.board_rotation: bool = board_rotation
-        self.active_pieces: dict[int, ChessBoardFigure] = {}
+        self.board = board
+        self.square_size = square_size
+        self.pieces_size_multiplier = pieces_size_multiplier
+        self.board_rotation = board_rotation
+        self.active_pieces = {}
         # init figures
         for square_id in board.piece_map():
             figure = board.piece_at(square_id)
@@ -48,7 +57,7 @@ class ChessBoardGui:
                                                                  str(figure), chess.square_name(square_id),
                                                                  (0, 0))
         # init overlays
-        self.overlays: list[SquareOverlay] = []
+        self.overlays = []
         # init chess field name to index
         self.chess_field_name_to_index = {f"{chr(97 + x)}{y + 1}": x + y * 8 for x in range(8) for y in range(8)}
         self.chess_index_to_field_name = {v: k for k, v in self.chess_field_name_to_index.items()}
@@ -161,7 +170,7 @@ class ChessBoardGui:
         """
         return self.active_pieces[square_id]
 
-    def get_correlating_square_name_or_none(self, pos: tuple) -> str or None:
+    def get_correlating_square_name_or_none(self, pos: tuple) -> str | None:
         """
         Get the correlating square id or None if not found.
         :param pos: Position of the mouse
@@ -183,7 +192,7 @@ class ChessBoardGui:
 
         return f"{chr(97 + x)}{8 - y}"
 
-    def get_correlating_square_id_or_none(self, pos: tuple) -> int or None:
+    def get_correlating_square_id_or_none(self, pos: tuple) -> int | None:
         """
         Get the correlating square id or None if not found.
         :param pos: Position of the mouse
@@ -194,7 +203,7 @@ class ChessBoardGui:
             return None
         return self.chess_field_name_to_index[name]
 
-    def get_selected_promotion(self, mouse_pos: tuple[int, int]) -> OverlayType or None:
+    def get_selected_promotion(self, mouse_pos: tuple[int, int]) -> OverlayType | None:
         """
         Get the selected promotion.
         :param mouse_pos: Mouse position

@@ -17,15 +17,20 @@ PIECES_SIZE = 0.7
 
 
 class MidGame(BaseState):
+    """
+    This class represents the mid game.
+    """
+    mid_game_states: dict[MidGameState, MidGameBaseState]
+    mid_game_state_name: MidGameState
+    mid_game_state: MidGameBaseState
+
     def __init__(self):
         super(MidGame, self).__init__()
         # init states
-        self.mid_game_states: dict[MidGameState, MidGameBaseState] = {MidGameState.PAUSE: MidGamePause(ChessColor.BLACK)}
+        self.mid_game_states: dict[MidGameState, MidGameBaseState] = {
+            MidGameState.PAUSE: MidGamePause(ChessColor.BLACK)}
         self.mid_game_state_name: MidGameState = MidGameState.PAUSE
         self.mid_game_state: MidGameBaseState = self.mid_game_states[self.mid_game_state_name]
-        # background
-        self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
-        self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -42,16 +47,20 @@ class MidGame(BaseState):
         if self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             # start with white
             if self.persist[PersistentDataKeys.STARTS_WITH_WHITE]:
-                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE,"Player 1",
+                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE, "Player 1",
                                                                                        board, board_gui)
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(ChessColor.BLACK,
-                    float(self.persist[PersistentDataKeys.DIFFICULTY]), board, board_gui)
+                                                                                   float(self.persist[
+                                                                                             PersistentDataKeys.DIFFICULTY]),
+                                                                                   board, board_gui)
             # start with black
             else:
                 board_gui.rotate_board()
                 self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(ChessColor.WHITE,
-                    float(self.persist[PersistentDataKeys.DIFFICULTY]), board, board_gui)
-                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK,"Player 1",
+                                                                                   float(self.persist[
+                                                                                             PersistentDataKeys.DIFFICULTY]),
+                                                                                   board, board_gui)
+                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 1",
                                                                                        board, board_gui)
         # multi player
         else:
@@ -66,18 +75,6 @@ class MidGame(BaseState):
         mid_game_persist = {
             MidGamePersistentDataKeys.CURRENT_TURN: self.mid_game_state_name
         }
-        self.mid_game_state.startup(mid_game_persist)
-
-    def flip_state(self) -> None:
-        """
-        Flips the state.
-        :return: None
-        """
-        next_state = self.mid_game_state.next_state
-        self.mid_game_state.done = False
-        self.mid_game_state_name = next_state
-        mid_game_persist = self.mid_game_state.mid_game_persist
-        self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         self.mid_game_state.startup(mid_game_persist)
 
     def get_event(self, event):
@@ -109,7 +106,19 @@ class MidGame(BaseState):
         surface.blit(self.background_image, self.background_rect)
         self.mid_game_state.draw(surface)
 
-    def checks_between_moves(self):
+    def flip_state(self) -> None:
+        """
+        Flips the state.
+        :return: None
+        """
+        next_state = self.mid_game_state.next_state
+        self.mid_game_state.done = False
+        self.mid_game_state_name = next_state
+        mid_game_persist = self.mid_game_state.mid_game_persist
+        self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
+        self.mid_game_state.startup(mid_game_persist)
+
+    def checks_between_moves(self) -> None:
         """
         Checks if the game is over or if the next player is in check.
         """

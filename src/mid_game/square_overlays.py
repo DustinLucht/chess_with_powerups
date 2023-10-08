@@ -17,13 +17,19 @@ class SquareOverlay:
     """
     Base class for all overlays.
     """
+    square_id: int
+    overlay_type: OverlayType
+    center_pos: tuple[int, int]
+    overlay_rect: pygame.Rect
+    overlay_surface: pygame.Surface
 
-    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int):
-        self.square_id: int = square_id
-        self.overlay_type: OverlayType = overlay_type
-        self.center_pos: tuple[int, int] = center_pos
-        self.overlay_rect: pygame.Rect = pygame.Rect(center_pos, (square_size, square_size))
-        self.overlay_surface: pygame.Surface = pygame.Surface((square_size, square_size))
+    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int,
+                 square_id: int) -> None:
+        self.square_id = square_id
+        self.overlay_type = overlay_type
+        self.center_pos = center_pos
+        self.overlay_rect = pygame.Rect(center_pos, (square_size, square_size))
+        self.overlay_surface = pygame.Surface((square_size, square_size))
 
     def draw(self, surface: pygame.Surface) -> None:
         """
@@ -37,10 +43,12 @@ class SquareOverlayMove(SquareOverlay):
     """
     SquareOverlayMove class.
     """
+    overlay_color: pygame.Color
+
     def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int):
         super().__init__(overlay_type, center_pos, square_size, square_id)
         x, y = center_pos
-        self.overlay_color: pygame.Color = COLOR_SCHEME[overlay_type]
+        self.overlay_color = COLOR_SCHEME[overlay_type]
         self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
         self.overlay_surface = pygame.Surface((square_size, square_size), pygame.SRCALPHA)
         self.overlay_surface.set_alpha(100)
@@ -54,11 +62,13 @@ class SquareOverlayPromotion(SquareOverlay):
     """
     SquareOverlayPromotion class.
     """
+    image_path: str
+
     def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int,
                  image_path: str):
         super().__init__(overlay_type, center_pos, square_size, square_id)
         x, y = center_pos
-        self.image_path: str = image_path
+        self.image_path = image_path
         self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
         self._create_overlay_surface_base(square_size)
         self._update_overlay_with_edges()

@@ -12,21 +12,33 @@ class MidGameBaseState(object):
     """
     This class represents the base state.
     """
+    done: bool
+    quit: bool
+    next_state: MidGameState
+    screen_rect: pygame.Rect
+    mid_game_persist: dict[MidGamePersistentDataKeys, object]
+    font: pygame.font.Font
+    board: chess.Board
+    board_gui: ChessBoardGui
+    background_image: pygame.Surface
+    background_rect: pygame.Rect
+    color: ChessColor
+
     def __init__(self, color: ChessColor) -> None:
-        self.done: bool = False
-        self.quit: bool = False
-        self.next_state: MidGameState = MidGameState.PAUSE
-        self.screen_rect: pygame.Rect = pygame.display.get_surface().get_rect()
-        self.mid_game_persist: dict[MidGamePersistentDataKeys, object] = {}
-        self.font: pygame.font.Font = pygame.font.Font(None, 24)
+        self.done = False
+        self.quit = False
+        self.next_state = MidGameState.PAUSE
+        self.screen_rect = pygame.display.get_surface().get_rect()
+        self.mid_game_persist = {}
+        self.font = pygame.font.Font(None, 24)
         # init board
-        self.board: chess.Board = chess.Board()
-        self.board_gui: ChessBoardGui = ChessBoardGui(self.board, 0, 0)
+        self.board = chess.Board()
+        self.board_gui = ChessBoardGui(self.board, 0, 0)
         # init background
-        self.background_image: pygame.Surface = pygame.Surface(self.screen_rect.size)
-        self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        self.background_image = pygame.Surface(self.screen_rect.size)
+        self.background_rect = self.background_image.get_rect(center=self.screen_rect.center)
         # vars
-        self.color: ChessColor = color
+        self.color = color
 
     def startup(self, mid_game_persistent: dict) -> None:
         """

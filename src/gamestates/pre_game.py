@@ -1,3 +1,6 @@
+"""
+Pre Game State
+"""
 import pygame
 
 from .base import BaseState
@@ -8,6 +11,9 @@ from pygame_widgets.button import Button
 
 
 class PreGame(BaseState):
+    """
+    This class represents the pre game.
+    """
     def __init__(self):
         super(PreGame, self).__init__()
         self.next_state: GameState = GameState.MID_GAME

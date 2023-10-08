@@ -5,18 +5,26 @@ from src.enums import GameState
 from src.gamestates.base import BaseState
 
 
-class Game(object):
+class Game:
     """
     This class represents the game.
     """
+    done: bool
+    screen: pygame.Surface
+    clock: pygame.time.Clock
+    fps: int
+    states: dict[GameState, BaseState]
+    state_name: GameState
+    state: BaseState
+
     def __init__(self, screen, states, start_state) -> None:
-        self.done: bool = False
-        self.screen: pygame.Surface = screen
-        self.clock: pygame.time.Clock = pygame.time.Clock()
-        self.fps: int = 60
-        self.states: dict[GameState, BaseState] = states
+        self.done = False
+        self.screen = screen
+        self.clock = pygame.time.Clock()
+        self.fps = 60
+        self.states = states
         self.state_name = start_state
-        self.state: BaseState = self.states[self.state_name]
+        self.state = self.states[self.state_name]
 
     def event_loop(self) -> None:
         """

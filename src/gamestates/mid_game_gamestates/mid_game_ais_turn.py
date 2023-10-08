@@ -9,10 +9,15 @@ from src.mid_game.chess_board_gui import ChessBoardGui
 
 
 class MidGameAIsTurn(MidGameBaseState):
+    """
+    This class represents the post game.
+    """
+    ais_strength: float
+
     def __init__(self, color: ChessColor, ais_strength: float, board: chess.Board, board_gui: ChessBoardGui):
         super(MidGameAIsTurn, self).__init__(color)
         # init vars
-        self.ais_strength: float = ais_strength
+        self.ais_strength = ais_strength
         self.board = board
         self.board_gui = board_gui
 

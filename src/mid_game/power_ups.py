@@ -8,8 +8,10 @@ class PowerUp:
     """
     This class represents a power-up.
     """
-    def __init__(self, power_up_type: PowerUpTypes):
-        self.power_up_type: PowerUpTypes = power_up_type
+    power_up_type: PowerUpTypes
+
+    def __init__(self, power_up_type: PowerUpTypes) -> None:
+        self.power_up_type = power_up_type
 
     def apply_power_up(self):
         """

@@ -9,10 +9,14 @@ class Player:
     """
     A player participating in the game.
     """
-    def __init__(self, name: str, color: ChessColor):
-        self.name: str = name
-        self.color: ChessColor = color
-        self.power_ups: list[PowerUp] = []
+    name: str
+    color: ChessColor
+    power_ups: list[PowerUp]
+
+    def __init__(self, name: str, color: ChessColor) -> None:
+        self.name = name
+        self.color = color
+        self.power_ups = []
 
     def get_name(self) -> str:
         """
@@ -21,14 +25,14 @@ class Player:
         """
         return self.name
 
-    def set_name(self, name: str):
+    def set_name(self, name: str) -> None:
         """
         Sets the name of the player.
         :param name: The new name of the player
         """
         self.name = name
 
-    def use_power_up(self, power_up: PowerUp):
+    def use_power_up(self, power_up: PowerUp) -> None:
         """
         Uses the given power-up.
         :param power_up: The power-up to be used

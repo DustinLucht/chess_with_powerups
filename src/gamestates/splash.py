@@ -4,15 +4,21 @@ from ..enums import GameState, PersistentDataKeys
 
 
 class Splash(BaseState):
+    """
+    This class represents the splash screen.
+    """
+    time_active: int
+    current_alpha: int
+
     def __init__(self):
         super(Splash, self).__init__()
-        self.next_state: GameState = GameState.MENU
-        self.time_active: int = 0
-        self.background_image: pygame.Surface = pygame.image.load(
+        self.next_state = GameState.MENU
+        self.time_active = 0
+        self.background_image = pygame.image.load(
             "..\\assets\\images\\board\\gr-stocks-Iq9SaJezkOE-unsplash.jpg")
-        self.current_alpha: float = 0.0
+        self.current_alpha = 0
         self.background_image = pygame.transform.scale(self.background_image, self.screen_rect.size)
-        self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
+        self.background_rect = self.background_image.get_rect(center=self.screen_rect.center)
 
     def update(self, dt):
         self.time_active += dt

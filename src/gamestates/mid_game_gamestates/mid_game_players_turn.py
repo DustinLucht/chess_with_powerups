@@ -11,6 +11,16 @@ from src.mid_game.player import Player
 
 
 class MidGamePlayersTurn(MidGameBaseState):
+    """
+    This class represents the mid game players turn.
+    """
+    is_figure_dragging: bool
+    id_square_selected: int
+    player: Player
+    time_clicked: float
+    button_down: bool
+    wait_for_separate_player_input: bool
+
     def __init__(self, color: ChessColor, players_name: str, board: chess.Board, board_gui: ChessBoardGui):
         super(MidGamePlayersTurn, self).__init__(color)
         # init vars

@@ -7,6 +7,9 @@ from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 
 
 class MidGamePause(MidGameBaseState):
+    """
+    This class represents the post game.
+    """
     def __init__(self, color):
         super(MidGamePause, self).__init__(color)
         pass
