@@ -36,7 +36,6 @@ class MidGamePlayersTurn(MidGameBaseState):
 
     def startup(self, mid_game_persistent):
         super(MidGamePlayersTurn, self).startup(mid_game_persistent)
-        self.board_gui.set_figures_according_to_board()
 
     def get_event(self, event):
         if self.wait_for_separate_player_input:
@@ -101,8 +100,7 @@ class MidGamePlayersTurn(MidGameBaseState):
             self.wait_for_separate_player_input = False
             self.id_square_selected = -1
             self.board_gui.set_figure_to_square(self.id_square_selected, self.player.color, selected_promotion)
-            self.board_gui.set_figures_according_to_board()
-            self.done = True
+            self._i_am_done()
 
     def _check_for_peasant_promotion(self, to_square_id: int) -> bool:
         """
@@ -219,6 +217,12 @@ class MidGamePlayersTurn(MidGameBaseState):
             self._handle_peasant_promotion(to_square_id)
             return
         self.board.push(chess.Move.from_uci(f"{figure.chess_position}{chess.square_name(to_square_id)}"))
-        self.board_gui.move_figure_and_del_old(self.id_square_selected, to_square_id)
+        self._i_am_done()
+
+    def _i_am_done(self):
+        """
+        Done.
+        :return:
+        """
         self.board_gui.set_figures_according_to_board()
         self.done = True

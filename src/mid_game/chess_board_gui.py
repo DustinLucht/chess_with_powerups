@@ -66,32 +66,30 @@ class ChessBoardGui:
         """
         Sets the figures.
         """
-        # find all pieces that are not on the board anymore
-        pieces_to_remove = []
-        for square_id in self.active_pieces:
-            if square_id not in self.board.piece_map():
-                pieces_to_remove.append(square_id)
-        # remove them
-        for square_id in pieces_to_remove:
-            del self.active_pieces[square_id]
-        # find all pieces that are new on the board (castling)
-        for square_id in self.board.piece_map():
-            if square_id not in self.active_pieces:
-                figure = self.board.piece_at(square_id)
-                self.active_pieces[square_id] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
-                                                                 f"..\\assets\\images\\pieces\\"
-                                                                 f"{PIECES[str(figure)]}",
-                                                                 str(figure), chess.square_name(square_id),
-                                                                 (0, 0))
-        for square_id in self.board.piece_map():
-            figure = self.board.piece_at(square_id)
-            if figure is not None:
-                piece = self.active_pieces.get(square_id)
-                piece.set_chess_position(chess.square_name(square_id))
-                if not piece.is_dragging():
-                    piece.set_cord_position(
-                        (self._get_square_coordinates_for_centered_figure(chess.square_name(square_id), piece.size)))
-        # clean all overlays
+        current_pieces = self.board.piece_map()
+
+        # Remove pieces that are not on the board anymore or have been replaced
+        squares_to_remove = [square for square in self.active_pieces if square not in current_pieces or
+                             self.active_pieces[square].name != str(current_pieces[square])]
+        for square in squares_to_remove:
+            del self.active_pieces[square]
+
+        # Add new pieces or pieces that have been replaced
+        for square, piece in current_pieces.items():
+            if square not in self.active_pieces:
+                self.active_pieces[square] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
+                                                              f"..\\assets\\images\\pieces\\{PIECES[str(piece)]}",
+                                                              str(piece), chess.square_name(square),
+                                                              (0, 0))
+
+        # Update the positions of the pieces
+        for square, piece in self.active_pieces.items():
+            piece.set_chess_position(chess.square_name(square))
+            if not piece.is_dragging():
+                piece.set_cord_position(
+                    self._get_square_coordinates_for_centered_figure(chess.square_name(square), piece.size))
+
+        # Clean all overlays
         self.overlays.clear()
 
     def set_selected_square(self, square_id: int) -> None:
@@ -248,15 +246,6 @@ class ChessBoardGui:
             if overlay.overlay_type == OverlayType.SELECTED_FIGURE and overlay.square_id == square_id:
                 return True
         return False
-
-    def move_figure_and_del_old(self, old_square_id: int, new_square_id: int) -> None:
-        """
-        Moves the figure.
-        :param old_square_id: Old square id
-        :param new_square_id: New square id
-        """
-        self.active_pieces[new_square_id] = self.active_pieces[old_square_id]
-        del self.active_pieces[old_square_id]
 
     def rotate_board(self) -> None:
         """
