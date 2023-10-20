@@ -176,13 +176,13 @@ class ChessBoardGui:
         """
         x, y = pos
         if self.board_rotation:
-            x = 960 - x
-            y = 960 - y
+            x = self.square_size * 8 - x
+            y = self.square_size * 8 - y
 
         if x < 0 or y < 0:
             return None
 
-        if x > 960 or y > 960:
+        if x > self.square_size * 8 or y > self.square_size * 8:
             return None
 
         x = x // self.square_size
