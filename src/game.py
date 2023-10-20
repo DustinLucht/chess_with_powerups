@@ -1,7 +1,7 @@
 import pygame
 import pygame_widgets
 
-from src.enums import GameState
+from src.enums import GameState, PersistentDataKeys
 from src.gamestates.base import BaseState
 
 
@@ -25,6 +25,16 @@ class Game:
         self.states = states
         self.state_name = start_state
         self.state = self.states[self.state_name]
+        persistent = {
+            PersistentDataKeys.BACKGROUND_IMAGE: None,
+            PersistentDataKeys.SINGLE_PLAYER: None,
+            PersistentDataKeys.STARTS_WITH_WHITE: None,
+            PersistentDataKeys.DIFFICULTY: None,
+            PersistentDataKeys.POWER_UP_MULTIPLICATOR: None,
+            PersistentDataKeys.OUTCOME: None,
+            PersistentDataKeys.BOARD_GUI: None
+        }
+        self.state.startup(persistent)
 
     def run(self) -> None:
         """

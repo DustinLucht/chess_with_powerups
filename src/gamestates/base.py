@@ -14,7 +14,7 @@ class BaseState:
     quit: bool
     next_state: GameState
     screen_rect: pygame.Rect
-    persist: dict[PersistentDataKeys, object]
+    persist: dict[PersistentDataKeys, any]
     font: pygame.font.Font
     background_image: pygame.Surface
     background_rect: pygame.Rect

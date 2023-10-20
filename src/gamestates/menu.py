@@ -2,8 +2,8 @@
 Menu game state
 """
 import pygame
-from .base import BaseState
-from ..enums import GameState, PersistentDataKeys
+from src.gamestates.base import BaseState
+from src.enums import GameState, PersistentDataKeys
 
 
 class Menu(BaseState):
@@ -16,43 +16,23 @@ class Menu(BaseState):
     def __init__(self):
         super(Menu, self).__init__()
         self.active_index = 0
-        self.options = {0: "Spiel starten", 1: "Optionen", 2: "Quit Game"}
         self.next_state = GameState.PRE_GAME
         self.font = pygame.font.Font(None, 45)
-
-    def _render_text(self, index: int) -> pygame.SurfaceType:
-        """
-        Renders the text.
-        :param index:
-        :return:
-        """
-        color = (141, 185, 244, 255) if index == self.active_index else pygame.Color("white")
-        return self.font.render(self.options[index], True, color)
-
-    def _get_text_position(self, text: pygame.SurfaceType, index: int) -> pygame.Rect:
-        """
-        Gets the text position.
-        :param text:
-        :param index:
-        :return:
-        """
-        center = (self.screen_rect.center[0], self.screen_rect.center[1] + (index * 100) - 100)
-        return text.get_rect(center=center)
-
-    def _decrease_current_index(self) -> None:
-        """
-        Decreases the current index.
-        :return: None
-        """
-        self.active_index = self.active_index - 1 if self.active_index > 0 else 0
-
-    def _increase_current_index(self) -> None:
-        """
-        Increases the current index.
-        :return: None
-        """
-        self.active_index = self.active_index + 1 if self.active_index < len(self.options) - 1 else len(
-            self.options) - 1
+        self.start_button = pygame.Rect(0, 0, 300, 50)
+        self.start_button.center = self.screen_rect.center
+        self.start_button.y -= 100
+        self.settings_button = pygame.Rect(0, 0, 300, 50)
+        self.settings_button.center = self.screen_rect.center
+        self.quit_button = pygame.Rect(0, 0, 300, 50)
+        self.quit_button.center = self.screen_rect.center
+        self.quit_button.y += 100
+        # draw text
+        self.start_text = self.font.render("Start", True, pygame.Color("black"))
+        self.start_text_rect = self.start_text.get_rect(center=self.start_button.center)
+        self.settings_text = self.font.render("Einstellungen", True, pygame.Color("black"))
+        self.settings_text_rect = self.settings_text.get_rect(center=self.settings_button.center)
+        self.quit_text = self.font.render("Beenden", True, pygame.Color("black"))
+        self.quit_text_rect = self.quit_text.get_rect(center=self.quit_button.center)
 
     def startup(self, persistent):
         super(Menu, self).startup(persistent)
@@ -61,52 +41,45 @@ class Menu(BaseState):
         self.next_state = GameState.PRE_GAME
         self.done = True
 
-    def handle_action(self):
-        """
-        Handles the action.
-        """
-        if self.active_index == 0:
-            self.next_state = GameState.PRE_GAME
-            self.done = True
-        if self.active_index == 1:
-            self.next_state = GameState.SETTINGS
-            # self.done = True
-        elif self.active_index == 2:
-            self.quit = True
-
     def get_event(self, event):
         if event.type == pygame.QUIT:
             self.quit = True
         elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_UP:
-                self._decrease_current_index()
-            elif event.key == pygame.K_DOWN:
-                self._increase_current_index()
-            elif event.key == pygame.K_RETURN:
-                self.handle_action()
-            elif event.key == pygame.K_SPACE:
-                self.handle_action()
-            elif event.key == pygame.K_ESCAPE:
+            if event.key == pygame.K_ESCAPE:
                 self.quit = True
         elif event.type == pygame.MOUSEBUTTONUP:
-            self.handle_action()
+            mouse_pos = pygame.mouse.get_pos()
+            if self.start_button.collidepoint(mouse_pos):
+                self.next_state = GameState.PRE_GAME
+                self.done = True
+            elif self.settings_button.collidepoint(mouse_pos):
+                self.next_state = GameState.SETTINGS
+                self.done = True
+            elif self.quit_button.collidepoint(mouse_pos):
+                self.quit = True
+        # check if mouse is hovering over a button and change color
         elif event.type == pygame.MOUSEMOTION:
             mouse_pos = pygame.mouse.get_pos()
-            self.active_index = -1
-            for index, option in enumerate(self.options):
-                text_render = self._render_text(index)
-                text_rect = self._get_text_position(text_render, index)
-                if text_rect.collidepoint(mouse_pos):
-                    self.active_index = index
-        elif event.type == pygame.MOUSEWHEEL:
-            if event.y < 0:
-                self._increase_current_index()
-            elif event.y > 0:
-                self._decrease_current_index()
+            if self.start_button.collidepoint(mouse_pos):
+                self.start_text = self.font.render("Start", True, pygame.Color("blue"))
+            else:
+                self.start_text = self.font.render("Start", True, pygame.Color("black"))
+            if self.settings_button.collidepoint(mouse_pos):
+                self.settings_text = self.font.render("Einstellungen", True, pygame.Color("blue"))
+            else:
+                self.settings_text = self.font.render("Einstellungen", True, pygame.Color("black"))
+            if self.quit_button.collidepoint(mouse_pos):
+                self.quit_text = self.font.render("Beenden", True, pygame.Color("blue"))
+            else:
+                self.quit_text = self.font.render("Beenden", True, pygame.Color("black"))
 
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)
-        for index, option in enumerate(self.options):
-            text_render = self._render_text(index)
-            surface.blit(text_render, self._get_text_position(text_render, index))
+        # draw buttons
+        pygame.draw.rect(surface, pygame.Color("white"), self.start_button)
+        pygame.draw.rect(surface, pygame.Color("white"), self.settings_button)
+        pygame.draw.rect(surface, pygame.Color("white"), self.quit_button)
+        surface.blit(self.start_text, self.start_text_rect)
+        surface.blit(self.settings_text, self.settings_text_rect)
+        surface.blit(self.quit_text, self.quit_text_rect)

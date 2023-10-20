@@ -1,6 +1,9 @@
+"""
+This module contains the Splash class.
+"""
 import pygame
-from .base import BaseState
-from ..enums import GameState, PersistentDataKeys
+from src.gamestates.base import BaseState
+from src.enums import GameState, PersistentDataKeys
 
 
 class Splash(BaseState):

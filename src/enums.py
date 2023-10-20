@@ -30,6 +30,7 @@ class PersistentDataKeys(Enum):
     DIFFICULTY = 3
     POWER_UP_MULTIPLICATOR = 4
     OUTCOME = 5
+    BOARD_GUI = 6
 
 
 class MidGamePersistentDataKeys(Enum):
@@ -38,6 +39,7 @@ class MidGamePersistentDataKeys(Enum):
     DRAW_OFFERED = 1
     DRAW_ACCEPTED = 2
     FORFEIT = 3
+    RESTART = 4
 
 
 class OverlayType(Enum):
