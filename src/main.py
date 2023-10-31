@@ -5,7 +5,7 @@ import sys
 
 import pygame
 
-from src.enums import GameState
+from src.enums import GameState, GlobalConstants
 from src.game import Game
 from src.gamestates.menu import Menu
 from src.gamestates.mid_game import MidGame
@@ -17,7 +17,7 @@ from src.gamestates.splash import Splash
 
 if __name__ == "__main__":
     pygame.init()
-    screen = pygame.display.set_mode((1920, 1080))
+    screen = pygame.display.set_mode((GlobalConstants.X_SCREEN_SIZE.value, GlobalConstants.Y_SCREEN_SIZE.value))
     pygame.display.set_caption("Schach mit Power-Ups")
     states = {
         GameState.SPLASH: Splash(),

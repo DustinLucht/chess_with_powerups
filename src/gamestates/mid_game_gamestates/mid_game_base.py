@@ -6,6 +6,7 @@ import pygame
 
 from src.enums import MidGamePersistentDataKeys, MidGameState, ChessColor
 from src.mid_game.chess_board_gui import ChessBoardGui
+from src.mid_game.player import Player
 
 
 class MidGameBaseState(object):
@@ -67,3 +68,10 @@ class MidGameBaseState(object):
         :param surface: surface
         """
         pass
+
+    def get_player_or_none(self) -> Player | None:
+        """
+        Gets the player or none.
+        :return: None
+        """
+        return None

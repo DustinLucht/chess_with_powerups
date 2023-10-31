@@ -9,7 +9,8 @@ from src.enums import OverlayType
 COLOR_SCHEME = {
     OverlayType.SELECTED_FIGURE: pygame.Color("yellow"),
     OverlayType.POSSIBLE_MOVE_NORMAL: pygame.Color("green"),
-    OverlayType.POSSIBLE_MOVE_ATTACK: pygame.Color("red")
+    OverlayType.POSSIBLE_MOVE_ATTACK: pygame.Color("red"),
+    OverlayType.BACKGROUND: pygame.Color(100, 100, 100),
 }
 
 
@@ -105,3 +106,21 @@ class SquareOverlayPromotion(SquareOverlay):
         """
         figure = pygame.transform.scale(pygame.image.load(self.image_path), (square_size, square_size))
         self.overlay_surface.blit(figure, (0, 0))
+
+
+class SquareOverlayPowerupBackground(SquareOverlay):
+    """
+    SquareOverlayPowerupBackground class.
+    """
+    overlay_color: pygame.Color
+
+    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int):
+        super().__init__(overlay_type, center_pos, square_size, square_id)
+        x, y = center_pos
+        self.overlay_color = COLOR_SCHEME[overlay_type]
+        self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
+        self.overlay_surface = pygame.Surface((square_size, square_size), pygame.SRCALPHA)
+
+    def draw(self, surface):
+        pygame.draw.rect(self.overlay_surface, self.overlay_color, self.overlay_surface.get_rect())
+        surface.blit(self.overlay_surface, self.overlay_rect)

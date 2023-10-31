@@ -60,7 +60,6 @@ class MidGamePause(MidGameBaseState):
 
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
-        surface.blit(self.background_image, self.background_rect)
         # draw buttons
         pygame.draw.rect(surface, pygame.Color("white"), self.resume_button)
         pygame.draw.rect(surface, pygame.Color("white"), self.restart_button)

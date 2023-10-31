@@ -4,6 +4,14 @@ This module contains the enums used in the game.
 from enum import Enum
 
 
+class GlobalConstants(Enum):
+    """Enum for the global constants."""
+    X_SCREEN_SIZE = 1920
+    Y_SCREEN_SIZE = 1080
+    SQUARE_SIZE_MULTIPLIER = 0.125
+    PIECES_SIZE = 0.7
+
+
 class GameState(Enum):
     """Enum for the different states of the game."""
     SPLASH = 0
@@ -51,6 +59,7 @@ class OverlayType(Enum):
     PROMOTION_ROOK = 4
     PROMOTION_BISHOP = 5
     PROMOTION_KNIGHT = 6
+    BACKGROUND = 7
 
 
 class ChessColor(Enum):

@@ -36,6 +36,7 @@ class MidGamePlayersTurn(MidGameBaseState):
 
     def startup(self, mid_game_persistent):
         super(MidGamePlayersTurn, self).startup(mid_game_persistent)
+        self.board_gui.set_figures_according_to_board()
 
     def get_event(self, event):
         if self.wait_for_separate_player_input:
@@ -226,3 +227,10 @@ class MidGamePlayersTurn(MidGameBaseState):
         """
         self.board_gui.set_figures_according_to_board()
         self.done = True
+
+    def get_player_or_none(self):
+        """
+        Gets the player or none.
+        :return: None
+        """
+        return self.player

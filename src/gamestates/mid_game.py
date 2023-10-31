@@ -4,16 +4,18 @@ MidGame class
 import pygame
 import chess
 
-from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState
+from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState, \
+    GlobalConstants
 from src.gamestates.base import BaseState
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.gamestates.mid_game_gamestates.mid_game_pause import MidGamePause
 from src.gamestates.mid_game_gamestates.mid_game_ais_turn import MidGameAIsTurn
 from src.gamestates.mid_game_gamestates.mid_game_players_turn import MidGamePlayersTurn
 from src.mid_game.chess_board_gui import ChessBoardGui
+from src.mid_game.players_ui import PlayersUI
 
-SQUARE_SIZE = 135
-PIECES_SIZE = 0.7
+SQUARE_SIZE = int(GlobalConstants.Y_SCREEN_SIZE.value * GlobalConstants.SQUARE_SIZE_MULTIPLIER.value)
+PIECES_SIZE = GlobalConstants.PIECES_SIZE.value
 
 
 class MidGame(BaseState):
@@ -23,6 +25,7 @@ class MidGame(BaseState):
     mid_game_states: dict[MidGameState, MidGameBaseState]
     mid_game_state_name: MidGameState
     mid_game_state: MidGameBaseState
+    players_ui: PlayersUI
     board_gui: ChessBoardGui
 
     def __init__(self):
@@ -34,6 +37,8 @@ class MidGame(BaseState):
         self.mid_game_state: MidGameBaseState = self.mid_game_states[self.mid_game_state_name]
         board: chess.Board = chess.Board()
         self.board_gui = ChessBoardGui(board, SQUARE_SIZE, PIECES_SIZE)
+        self.players_ui = PlayersUI((SQUARE_SIZE * 8, 0), (GlobalConstants.X_SCREEN_SIZE.value,
+                                                           GlobalConstants.Y_SCREEN_SIZE.value))
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -83,6 +88,7 @@ class MidGame(BaseState):
             MidGamePersistentDataKeys.RESTART: False
         }
         self.persist[PersistentDataKeys.BOARD_GUI] = self.board_gui
+        self.players_ui.change_player(mid_game_persist, self.mid_game_states[self.mid_game_state_name].get_player_or_none())
         self.mid_game_state.startup(mid_game_persist)
 
     def get_event(self, event):
@@ -102,6 +108,7 @@ class MidGame(BaseState):
                     self.mid_game_state.next_state = self.mid_game_state.mid_game_persist[
                         MidGamePersistentDataKeys.CURRENT_TURN]
         self.mid_game_state.get_event(event)
+        self.players_ui.get_event(event, self.board_gui.board)
 
     def update(self, dt):
         if self.mid_game_state.quit:
@@ -116,6 +123,7 @@ class MidGame(BaseState):
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)
+        self.players_ui.draw(surface)
         self.mid_game_state.draw(surface)
 
     def flip_state(self) -> None:
@@ -133,6 +141,8 @@ class MidGame(BaseState):
         mid_game_persist = self.mid_game_state.mid_game_persist
         self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         self.mid_game_state.startup(mid_game_persist)
+        self.players_ui.change_player(mid_game_persist,
+                                      self.mid_game_states[self.mid_game_state_name].get_player_or_none())
 
     def _checks_between_moves(self) -> None:
         """
@@ -146,6 +156,9 @@ class MidGame(BaseState):
         # rotate board
         if not self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             self.mid_game_state.board_gui.rotate_board()
+
+        # get ui stuff
+        self.mid_game_state.mid_game_persist = self.players_ui.mid_game_persist
 
         # check if game is over
         outcome = self.mid_game_state.board.outcome()

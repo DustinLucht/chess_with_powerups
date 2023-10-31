@@ -1,6 +1,8 @@
 """
 This module contains the Player class, representing a player.
 """
+import chess
+
 from src.enums import ChessColor
 from src.mid_game.power_ups import PowerUp
 
@@ -32,10 +34,19 @@ class Player:
         """
         self.name = name
 
-    def use_power_up(self, power_up: PowerUp) -> None:
+    def use_powerup(self, i: int, board: chess.Board) -> None:
         """
         Uses the given power-up.
-        :param power_up: The power-up to be used
+        :param board: The board on which the power-up is used
+        :param i: index of the power-up to be used
         """
-        # Implement the usage of the power-up here
-        pass
+        if i < len(self.power_ups):
+            self.power_ups[i].apply_power_up(board)
+
+    def add_powerup(self, power_up: PowerUp) -> None:
+        """
+        Adds the given power-up to the player.
+        :param power_up: The power-up to be added
+        """
+        if len(self.power_ups) < 4:
+            self.power_ups.append(power_up)

@@ -31,14 +31,8 @@ class MidGameAIsTurn(MidGameBaseState):
         # Make the AI move in a separate process
         self._make_ai_move()
 
-    def get_event(self, event):
-        pass
-
     def draw(self, surface):
         self.board_gui.draw(surface)
-
-    def update(self, dt):
-        pass
 
     def _ai_play(self, board, time_limit, queue):
         result = self.engine.play(board, chess.engine.Limit(time=time_limit))
