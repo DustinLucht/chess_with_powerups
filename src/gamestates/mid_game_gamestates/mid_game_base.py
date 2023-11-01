@@ -7,6 +7,7 @@ import pygame
 from src.enums import MidGamePersistentDataKeys, MidGameState, ChessColor
 from src.mid_game.chess_board_gui import ChessBoardGui
 from src.mid_game.player import Player
+from src.mid_game.power_ups import PowerUp
 
 
 class MidGameBaseState(object):
@@ -24,6 +25,7 @@ class MidGameBaseState(object):
     background_image: pygame.Surface
     background_rect: pygame.Rect
     color: ChessColor
+    active_powerup: PowerUp | None
 
     def __init__(self, color: ChessColor) -> None:
         self.done = False
@@ -40,6 +42,7 @@ class MidGameBaseState(object):
         self.background_rect = self.background_image.get_rect(center=self.screen_rect.center)
         # vars
         self.color = color
+        self.active_powerup = None
 
     def startup(self, mid_game_persistent: dict) -> None:
         """
@@ -75,3 +78,10 @@ class MidGameBaseState(object):
         :return: None
         """
         return None
+
+    def activate_powerup(self, powerup: PowerUp) -> None:
+        """
+        Activates the powerup.
+        :param powerup: powerup
+        """
+        self.active_powerup = powerup

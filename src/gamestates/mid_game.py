@@ -108,7 +108,7 @@ class MidGame(BaseState):
                     self.mid_game_state.next_state = self.mid_game_state.mid_game_persist[
                         MidGamePersistentDataKeys.CURRENT_TURN]
         self.mid_game_state.get_event(event)
-        self.players_ui.get_event(event, self.board_gui.board)
+        self.players_ui.get_event(event, self.mid_game_state.activate_powerup)
         # check for draw
         if self.players_ui.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED]:
             self._checks_between_moves()

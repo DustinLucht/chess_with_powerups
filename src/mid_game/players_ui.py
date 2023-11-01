@@ -1,12 +1,11 @@
 """
 This module contains the mid game players ui gamestate.
 """
-import chess
 import pygame
 
 from src.enums import OverlayType, MidGamePersistentDataKeys
 from src.mid_game.player import Player
-from src.mid_game.square_overlays import SquareOverlayPowerupBackground
+from src.mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
 
 
 class PlayersUI:
@@ -18,6 +17,8 @@ class PlayersUI:
     starting_coordinate: tuple[int, int]
     size: tuple[int, int]
     background: list[SquareOverlayPowerupBackground]
+    powerups: list[SquareOverlayPowerUp]
+    powerup_is_active: bool
     draw_offered_in_last_turn: bool
 
     def __init__(self, starting_coordinate: tuple[int, int], size: tuple[int, int]) -> None:
@@ -27,6 +28,7 @@ class PlayersUI:
         self.starting_coordinate = starting_coordinate
         self.size = size
         self.draw_offered_in_last_turn = True
+        self.powerup_is_active = False
         # init background
         square_size = int((size[0] - (starting_coordinate[0] + 100)) * 0.25)
         self.background = []
@@ -35,6 +37,7 @@ class PlayersUI:
                 OverlayType.BACKGROUND,
                 (size[0] - i * (square_size + 5), self.starting_coordinate[1] + 5),
                 square_size, 0))
+        self.powerups = []
         # offer
         x_size_of_remaining_space = (size[0] - starting_coordinate[0])
         self.offer_rect = pygame.Rect(starting_coordinate[0] + x_size_of_remaining_space * 0.5 - 150, size[1] * 0.5, 300, 100)
@@ -57,19 +60,34 @@ class PlayersUI:
         self.mid_game_persist = mid_game_persistent
         self.player = player
         self.draw_offered_in_last_turn = True
+        self.powerup_is_active = False
+        # init powerups
+        self.powerups = []
+        square_size = int((self.size[0] - (self.starting_coordinate[0] + 100)) * 0.25)
+        for i, powerup in enumerate(player.get_powerups()):
+            self.powerups.append(SquareOverlayPowerUp(
+                OverlayType.POWERUP,
+                (self.size[0] - (i + 1) * (square_size + 5), self.starting_coordinate[1] + 5),
+                square_size, 0, powerup))
 
-    def get_event(self, event: pygame.event.Event, board: chess.Board) -> None:
+    def get_event(self, event: pygame.event.Event, activate_powerup_function: callable) -> None:
         """
         Gets an event.
-        :param board: board
+        :param activate_powerup_function: activate powerup function
         :param event: event
         """
         if self.player is not None:
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
-                    for i in range(4):
-                        if self.background[i].overlay_rect.collidepoint(event.pos):
-                            self.player.use_powerup(i, board)
+                    if not self.powerup_is_active:
+                        for i in range(4):
+                            if self.background[i].overlay_rect.collidepoint(event.pos):
+                                if len(self.powerups) < i:
+                                    activate_powerup_function(self.player.get_powerup(i))
+                                    self.player.use_powerup(i)
+                                    self.powerups[i].activate_powerup()
+                                    self.powerup_is_active = True
+                                    break
                     if self.offer_rect.collidepoint(event.pos):
                         if self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] is None:
                             self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] = self.player.color

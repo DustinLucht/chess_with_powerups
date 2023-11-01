@@ -60,6 +60,7 @@ class OverlayType(Enum):
     PROMOTION_BISHOP = 5
     PROMOTION_KNIGHT = 6
     BACKGROUND = 7
+    POWERUP = 8
 
 
 class ChessColor(Enum):

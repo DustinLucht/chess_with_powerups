@@ -108,6 +108,62 @@ class SquareOverlayPromotion(SquareOverlay):
         self.overlay_surface.blit(figure, (0, 0))
 
 
+class SquareOverlayPowerUp(SquareOverlay):
+    """
+    SquareOverlayPowerUp class.
+    """
+    image_path: str
+
+    def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int,
+                 image_path: str):
+        super().__init__(overlay_type, center_pos, square_size, square_id)
+        x, y = center_pos
+        self.image_path = image_path
+        self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
+        self._create_overlay_surface_base(square_size)
+        self._update_overlay_with_figure(square_size)
+
+    def draw(self, surface):
+        surface.blit(self.overlay_surface, self.overlay_rect)
+
+    def _create_overlay_surface_base(self, square_size: int) -> None:
+        """
+        Creates the base of the overlay surface.
+        :param square_size: Size of the square.
+        """
+        self.overlay_surface = pygame.Surface((square_size, square_size), pygame.SRCALPHA)
+        # self.overlay_surface.set_alpha(100)
+        self.overlay_surface.fill(CHESS_BOARD_COLORS[0])
+
+    def _update_overlay_with_figure(self, square_size: int) -> None:
+        """
+        Updates the overlay with the figure.
+        :param square_size: Size of the square.
+        """
+        figure = pygame.transform.scale(pygame.image.load(self.image_path), (square_size, square_size))
+        self.overlay_surface.blit(figure, (0, 0))
+
+    def _update_overlay_with_edges(self) -> None:
+        """
+        Updates the overlay with the edges.
+        """
+        pygame.draw.rect(self.overlay_surface, pygame.Color("green"), self.overlay_surface.get_rect(), 2)
+        pygame.draw.rect(self.overlay_surface, pygame.Color("green"), self.overlay_surface.get_rect().inflate(-2, -2),
+                         2)
+        pygame.draw.rect(self.overlay_surface, pygame.Color("green"), self.overlay_surface.get_rect().inflate(-4, -4),
+                         2)
+        pygame.draw.rect(self.overlay_surface, pygame.Color("green"), self.overlay_surface.get_rect().inflate(-6, -6),
+                         2)
+
+    def activate_powerup(self) -> None:
+        """
+        Gives the powerup to a green edge.
+        """
+        self.overlay_surface.fill(CHESS_BOARD_COLORS[1])
+        self._update_overlay_with_edges()
+        self._update_overlay_with_figure(self.overlay_rect.width)
+
+
 class SquareOverlayPowerupBackground(SquareOverlay):
     """
     SquareOverlayPowerupBackground class.

@@ -27,6 +27,21 @@ class Player:
         """
         return self.name
 
+    def get_powerup(self, i: int) -> PowerUp:
+        """
+        Returns the power-up at the given index.
+        :param i: index of the power-up
+        :return: The power-up at the given index
+        """
+        return self.power_ups[i]
+
+    def get_powerups(self) -> list[PowerUp]:
+        """
+        Returns all power-ups of the player.
+        :return: All power-ups of the player
+        """
+        return self.power_ups
+
     def set_name(self, name: str) -> None:
         """
         Sets the name of the player.
@@ -34,14 +49,12 @@ class Player:
         """
         self.name = name
 
-    def use_powerup(self, i: int, board: chess.Board) -> None:
+    def use_powerup(self, i: int) -> None:
         """
         Uses the given power-up.
-        :param board: The board on which the power-up is used
         :param i: index of the power-up to be used
         """
-        if i < len(self.power_ups):
-            self.power_ups[i].apply_power_up(board)
+        del self.power_ups[i]
 
     def add_powerup(self, power_up: PowerUp) -> None:
         """
