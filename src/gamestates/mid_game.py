@@ -3,6 +3,7 @@ MidGame class
 """
 import pygame
 import chess
+import chess.engine
 
 from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState, \
     GlobalConstants
@@ -27,6 +28,7 @@ class MidGame(BaseState):
     mid_game_state: MidGameBaseState
     players_ui: PlayersUI
     board_gui: ChessBoardGui
+    engine: chess.engine.SimpleEngine
 
     def __init__(self):
         super(MidGame, self).__init__()
@@ -39,6 +41,7 @@ class MidGame(BaseState):
         self.board_gui = ChessBoardGui(board, SQUARE_SIZE, PIECES_SIZE)
         self.players_ui = PlayersUI((SQUARE_SIZE * 8, 0), (GlobalConstants.X_SCREEN_SIZE.value,
                                                            GlobalConstants.Y_SCREEN_SIZE.value))
+        self.engine = chess.engine.SimpleEngine.popen_uci(r"..\assets\stockfish\stockfish-windows-x86-64-avx2.exe")
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -60,14 +63,14 @@ class MidGame(BaseState):
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(ChessColor.BLACK,
                                                                                    float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui)
+                                                                                   board, self.board_gui, self.engine)
             # start with black
             else:
                 self.board_gui.rotate_board()
                 self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(ChessColor.WHITE,
                                                                                    float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui)
+                                                                                   board, self.board_gui, self.engine)
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 1",
                                                                                        board, self.board_gui)
         # multi player
@@ -153,6 +156,9 @@ class MidGame(BaseState):
         """
         # get ui stuff
         self.mid_game_state.mid_game_persist = self.players_ui.mid_game_persist
+
+        # update ui stuff
+        self.players_ui.update_evaluation(self.mid_game_state.board, self.engine)
 
         # check if game is over
         outcome = self.mid_game_state.board.outcome()

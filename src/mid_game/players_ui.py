@@ -1,9 +1,12 @@
 """
 This module contains the mid game players ui gamestate.
 """
+import chess
+import chess.engine
 import pygame
 
 from src.enums import OverlayType, MidGamePersistentDataKeys
+from src.mid_game.evaluation_bar import EvaluationBar
 from src.mid_game.player import Player
 from src.mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
 
@@ -20,6 +23,7 @@ class PlayersUI:
     powerups: list[SquareOverlayPowerUp]
     powerup_is_active: bool
     draw_offered_in_last_turn: bool
+    evaluation_bar: EvaluationBar
 
     def __init__(self, starting_coordinate: tuple[int, int], size: tuple[int, int]) -> None:
         # init vars
@@ -40,16 +44,22 @@ class PlayersUI:
         self.powerups = []
         # offer
         x_size_of_remaining_space = (size[0] - starting_coordinate[0])
-        self.offer_rect = pygame.Rect(starting_coordinate[0] + x_size_of_remaining_space * 0.5 - 150, size[1] * 0.5, 300, 100)
+        self.offer_rect = pygame.Rect(starting_coordinate[0] + x_size_of_remaining_space * 0.5 - 150, size[1] * 0.5,
+                                      300, 100)
         label = f"Draw anbieten"
         font = pygame.font.Font(None, 36)
         self.offer_text = font.render(label, True, (0, 0, 0))
         self.offer_text_rect = self.offer_text.get_rect(center=self.offer_rect.center)
-        # draw accept offer
-        self.accept_rect = pygame.Rect(starting_coordinate[0] + x_size_of_remaining_space * 0.5 - 150, size[1] * 0.5 + 200, 300, 100)
+        # accept offer
+        self.accept_rect = pygame.Rect(starting_coordinate[0] + x_size_of_remaining_space * 0.5 - 150,
+                                       size[1] * 0.5 + 200, 300, 100)
         label = f"Draw akzeptieren"
         self.accept_text = font.render(label, True, (0, 0, 0))
         self.accept_text_rect = self.accept_text.get_rect(center=self.accept_rect.center)
+        # evaluation bar
+        bar_starting_coordinate = (self.starting_coordinate[0] + 15, 10)
+        bar_size = (50, size[1] - 20)
+        self.evaluation_bar = EvaluationBar(bar_starting_coordinate, bar_size)
 
     def change_player(self, mid_game_persistent: dict, player: Player) -> None:
         """
@@ -100,10 +110,24 @@ class PlayersUI:
         Draws the state.
         :param surface: surface
         """
+        # background
         for background in self.background:
             background.draw(surface)
+        # powerups
+        for powerup in self.powerups:
+            powerup.draw(surface)
         # offer
         self._draw_offer(surface)
+        self.evaluation_bar.draw(surface)
+
+    def update_evaluation(self, board: chess.Board, engine: chess.engine.SimpleEngine) -> None:
+        """
+        Updates the evaluation.
+        :param board: chess board
+        :param engine: engine
+        :return:
+        """
+        self.evaluation_bar.update_evaluation(board, engine)
 
     def _draw_offer(self, surface: pygame.Surface) -> None:
         """
