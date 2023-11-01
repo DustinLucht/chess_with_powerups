@@ -23,9 +23,9 @@ class PowerUp:
         pass
 
 
-class FreezePowerUp(PowerUp):
+class DestroyPowerUp(PowerUp):
     def __init__(self):
-        super().__init__(PowerUpTypes.FREEZE)
+        super().__init__(PowerUpTypes.DESTROY)
 
     def apply_power_up(self, board):
         # Implement the logic for the Freeze power-up here
@@ -38,4 +38,22 @@ class DoubleMovePowerUp(PowerUp):
 
     def apply_power_up(self, board):
         # Implement the logic for the DoubleMove power-up here
+        pass
+
+
+class AIHelpsPowerUp(PowerUp):
+    def __init__(self):
+        super().__init__(PowerUpTypes.AI_HELPS)
+
+    def apply_power_up(self, board):
+        # Implement the logic for the AIHelps power-up here
+        pass
+
+
+class RandomPromotionPowerUp(PowerUp):
+    def __init__(self):
+        super().__init__(PowerUpTypes.RANDOM_PROMOTION)
+
+    def apply_power_up(self, board):
+        # Implement the logic for the RandomPromotion power-up here
         pass

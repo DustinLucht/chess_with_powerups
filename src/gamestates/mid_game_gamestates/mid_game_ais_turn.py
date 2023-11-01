@@ -17,15 +17,14 @@ class MidGameAIsTurn(MidGameBaseState):
     ais_strength: float
     engine: chess.engine.SimpleEngine
 
-    def __init__(self, color: ChessColor, ais_strength: float, board: chess.Board, board_gui: ChessBoardGui,
-                 engine: chess.engine.SimpleEngine) -> None:
+    def __init__(self, color: ChessColor, ais_strength: float, board: chess.Board, board_gui: ChessBoardGui) -> None:
         super(MidGameAIsTurn, self).__init__(color)
         # init vars
         self.ais_strength = ais_strength
         self.board = board
         self.board_gui = board_gui
         # Load Stockfish engine
-        self.engine = engine
+        self.engine = chess.engine.SimpleEngine.popen_uci(r"..\assets\stockfish\stockfish-windows-x86-64-avx2.exe")
 
     def startup(self, mid_game_persistent):
         super(MidGameAIsTurn, self).startup(mid_game_persistent)

@@ -1,14 +1,22 @@
 """
 This module contains the mid game players ui gamestate.
 """
-import chess
 import chess.engine
 import pygame
 
-from src.enums import OverlayType, MidGamePersistentDataKeys
+from src.enums import OverlayType, MidGamePersistentDataKeys, PowerUpTypes
 from src.mid_game.evaluation_bar import EvaluationBar
 from src.mid_game.player import Player
 from src.mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
+
+# TODO https://www.craiyon.com/
+POWERUPS_IMAGE_PATHS = {
+    PowerUpTypes.DESTROY: r"..\assets\images\powerups\craiyon_184052_chess_pawn_logo_on_fire_with_dark_background.png",
+    PowerUpTypes.DOUBLE_MOVE: r"..\assets\images\powerups\craiyon_184729_black_chess_pawn_with_a__2x__marking.png",
+    PowerUpTypes.AI_HELPS: r"..\assets\images\powerups\craiyon_184158_A_Robot_staring_at_a_chess_board.png",
+    PowerUpTypes.RANDOM_PROMOTION: r"..\assets\images\powerups\craiyon_184538_A_chess_pawn_with_a_large_question_mark_"
+                                   r"above_it__surrounded_by_silhouettes_of_higher.png",
+}
 
 
 class PlayersUI:
@@ -61,7 +69,7 @@ class PlayersUI:
         bar_size = (50, size[1] - 20)
         self.evaluation_bar = EvaluationBar(bar_starting_coordinate, bar_size)
 
-    def change_player(self, mid_game_persistent: dict, player: Player) -> None:
+    def change_player(self, mid_game_persistent: dict, player: Player | None) -> None:
         """
         Changes to the player.
         :param player: player
@@ -74,11 +82,12 @@ class PlayersUI:
         # init powerups
         self.powerups = []
         square_size = int((self.size[0] - (self.starting_coordinate[0] + 100)) * 0.25)
-        for i, powerup in enumerate(player.get_powerups()):
-            self.powerups.append(SquareOverlayPowerUp(
-                OverlayType.POWERUP,
-                (self.size[0] - (i + 1) * (square_size + 5), self.starting_coordinate[1] + 5),
-                square_size, 0, powerup))
+        if player is not None:
+            for i, powerup in enumerate(player.get_powerups()):
+                self.powerups.append(SquareOverlayPowerUp(
+                    OverlayType.POWERUP,
+                    (self.size[0] - (i + 1) * (square_size + 5), self.starting_coordinate[1] + 5),
+                    square_size, 0, POWERUPS_IMAGE_PATHS[powerup.power_up_type]))
 
     def get_event(self, event: pygame.event.Event, activate_powerup_function: callable) -> None:
         """
@@ -105,6 +114,13 @@ class PlayersUI:
                     if self.accept_rect.collidepoint(event.pos):
                         self.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED] = True
 
+    def get_current_score(self) -> float:
+        """
+        Gets the current score.
+        :return: current score
+        """
+        return self.evaluation_bar.evaluation_value
+
     def draw(self, surface: pygame.Surface) -> None:
         """
         Draws the state.
@@ -120,14 +136,13 @@ class PlayersUI:
         self._draw_offer(surface)
         self.evaluation_bar.draw(surface)
 
-    def update_evaluation(self, board: chess.Board, engine: chess.engine.SimpleEngine) -> None:
+    def update_evaluation(self, board: chess.Board) -> None:
         """
         Updates the evaluation.
         :param board: chess board
-        :param engine: engine
         :return:
         """
-        self.evaluation_bar.update_evaluation(board, engine)
+        self.evaluation_bar.update_evaluation(board)
 
     def _draw_offer(self, surface: pygame.Surface) -> None:
         """

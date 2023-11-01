@@ -71,5 +71,7 @@ class ChessColor(Enum):
 
 class PowerUpTypes(Enum):
     """Enum for the different types of power-ups."""
-    FREEZE = 1
+    DESTROY = 1
     DOUBLE_MOVE = 2
+    AI_HELPS = 3
+    RANDOM_PROMOTION = 4

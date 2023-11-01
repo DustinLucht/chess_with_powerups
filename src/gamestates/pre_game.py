@@ -117,7 +117,7 @@ class PreGame(BaseState):
         """
         Starts the game.
         """
-        self.persist[PersistentDataKeys.SINGLE_PLAYER] = False #not self.toggle_multiplayer.getValue() # True  # TODO remove not self.toggle_multiplayer.getValue()
+        self.persist[PersistentDataKeys.SINGLE_PLAYER] = not self.toggle_multiplayer.getValue()
         self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.toggle_playing_as.getValue()
         self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue() / 5000
         self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()

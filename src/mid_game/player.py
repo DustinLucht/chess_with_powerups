@@ -56,10 +56,11 @@ class Player:
         """
         del self.power_ups[i]
 
-    def add_powerup(self, power_up: PowerUp) -> None:
+    def add_powerup(self, power_up: PowerUp | None) -> None:
         """
         Adds the given power-up to the player.
         :param power_up: The power-up to be added
         """
         if len(self.power_ups) < 4:
-            self.power_ups.append(power_up)
+            if power_up is not None:
+                self.power_ups.append(power_up)

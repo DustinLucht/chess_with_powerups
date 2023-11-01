@@ -1,12 +1,14 @@
 """
 MidGame class
 """
+import random
+
 import pygame
 import chess
 import chess.engine
 
 from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState, \
-    GlobalConstants
+    GlobalConstants, PowerUpTypes
 from src.gamestates.base import BaseState
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.gamestates.mid_game_gamestates.mid_game_pause import MidGamePause
@@ -14,6 +16,7 @@ from src.gamestates.mid_game_gamestates.mid_game_ais_turn import MidGameAIsTurn
 from src.gamestates.mid_game_gamestates.mid_game_players_turn import MidGamePlayersTurn
 from src.mid_game.chess_board_gui import ChessBoardGui
 from src.mid_game.players_ui import PlayersUI
+from src.mid_game.power_ups import PowerUp, DestroyPowerUp, DoubleMovePowerUp, AIHelpsPowerUp, RandomPromotionPowerUp
 
 SQUARE_SIZE = int(GlobalConstants.Y_SCREEN_SIZE.value * GlobalConstants.SQUARE_SIZE_MULTIPLIER.value)
 PIECES_SIZE = GlobalConstants.PIECES_SIZE.value
@@ -28,7 +31,6 @@ class MidGame(BaseState):
     mid_game_state: MidGameBaseState
     players_ui: PlayersUI
     board_gui: ChessBoardGui
-    engine: chess.engine.SimpleEngine
 
     def __init__(self):
         super(MidGame, self).__init__()
@@ -41,7 +43,6 @@ class MidGame(BaseState):
         self.board_gui = ChessBoardGui(board, SQUARE_SIZE, PIECES_SIZE)
         self.players_ui = PlayersUI((SQUARE_SIZE * 8, 0), (GlobalConstants.X_SCREEN_SIZE.value,
                                                            GlobalConstants.Y_SCREEN_SIZE.value))
-        self.engine = chess.engine.SimpleEngine.popen_uci(r"..\assets\stockfish\stockfish-windows-x86-64-avx2.exe")
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -63,14 +64,14 @@ class MidGame(BaseState):
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(ChessColor.BLACK,
                                                                                    float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui, self.engine)
+                                                                                   board, self.board_gui)
             # start with black
             else:
                 self.board_gui.rotate_board()
                 self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(ChessColor.WHITE,
                                                                                    float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui, self.engine)
+                                                                                   board, self.board_gui)
                 self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 1",
                                                                                        board, self.board_gui)
         # multi player
@@ -147,8 +148,48 @@ class MidGame(BaseState):
         mid_game_persist = self.mid_game_state.mid_game_persist
         self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         self.mid_game_state.startup(mid_game_persist)
-        self.players_ui.change_player(mid_game_persist,
-                                      self.mid_game_states[self.mid_game_state_name].get_player_or_none())
+        # add powerup if player
+        if self.mid_game_state.get_player_or_none() is not None:
+            self._add_powerup()
+        # update ui
+        self.players_ui.change_player(mid_game_persist, self.mid_game_state.get_player_or_none())
+
+    def _add_powerup(self) -> None:
+        """
+        Adds a powerup to the board.
+        :return: None
+        """
+        current_score = self.players_ui.get_current_score()
+        player = self.mid_game_state.get_player_or_none()
+        if player.color == ChessColor.WHITE:
+            if current_score <= -0.1:
+                player.add_powerup(self.get_random_powerup_or_none())
+        else:
+            if current_score >= 0.1:
+                player.add_powerup(self.get_random_powerup_or_none())
+
+    def get_random_powerup_or_none(self) -> PowerUp | None:
+        """
+        Gets a random powerup or None.
+        :return: random powerup or None
+        """
+        multiplier = self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR]
+        probability = multiplier / 10  # Convert the multiplier into a probability between 0.1 and 1.0
+
+        # If a random number is less than the probability, we give a power-up
+        if random.random() < probability:
+            power_up_choice = random.choice(list(PowerUpTypes))
+
+            if power_up_choice == PowerUpTypes.DESTROY:
+                return DestroyPowerUp()
+            elif power_up_choice == PowerUpTypes.DOUBLE_MOVE:
+                return DoubleMovePowerUp()
+            elif power_up_choice == PowerUpTypes.AI_HELPS:
+                return AIHelpsPowerUp()
+            elif power_up_choice == PowerUpTypes.RANDOM_PROMOTION:
+                return RandomPromotionPowerUp()
+        else:
+            return None
 
     def _checks_between_moves(self) -> None:
         """
@@ -158,7 +199,7 @@ class MidGame(BaseState):
         self.mid_game_state.mid_game_persist = self.players_ui.mid_game_persist
 
         # update ui stuff
-        self.players_ui.update_evaluation(self.mid_game_state.board, self.engine)
+        self.players_ui.update_evaluation(self.mid_game_state.board)
 
         # check if game is over
         outcome = self.mid_game_state.board.outcome()
