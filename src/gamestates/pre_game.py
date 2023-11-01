@@ -37,8 +37,8 @@ class PreGame(BaseState):
                                         fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
                                         handleColour=(150, 150, 150), handleRadius=18, initial=True)
         self.textbox_difficulty_render = self.font.render("Schwierigkeit: 10.0", True, (255, 255, 255))
-        self.slider_difficulty = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=0.1,
-                                        max=10, step=0.1, handleColour=(150, 150, 150), handleRadius=18,
+        self.slider_difficulty = Slider(pygame.display.get_surface(), 1000, 400, 800, 40, min=1,
+                                        max=1000, step=1, handleColour=(150, 150, 150), handleRadius=18,
                                         initial=1)
         self.textbox_power_up_multiplier = self.font.render("Power Up Muliplicator: 1", True,
                                                             (255, 255, 255))
@@ -62,7 +62,7 @@ class PreGame(BaseState):
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
         self.next_state = GameState.MID_GAME
         self._set_persist()
-        self.done = True
+        #self.done = True
 
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
@@ -117,7 +117,7 @@ class PreGame(BaseState):
         """
         Starts the game.
         """
-        self.persist[PersistentDataKeys.SINGLE_PLAYER] = False # not self.toggle_multiplayer.getValue() # True  # TODO remove not self.toggle_multiplayer.getValue()
+        self.persist[PersistentDataKeys.SINGLE_PLAYER] = False #not self.toggle_multiplayer.getValue() # True  # TODO remove not self.toggle_multiplayer.getValue()
         self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.toggle_playing_as.getValue()
-        self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue()
+        self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue() / 5000
         self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()

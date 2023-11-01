@@ -75,7 +75,7 @@ class PlayersUI:
                             self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] = self.player.color
                             self.draw_offered_in_last_turn = False
                     if self.accept_rect.collidepoint(event.pos):
-                        pass
+                        self.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED] = True
 
     def draw(self, surface: pygame.Surface) -> None:
         """

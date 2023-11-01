@@ -109,6 +109,9 @@ class MidGame(BaseState):
                         MidGamePersistentDataKeys.CURRENT_TURN]
         self.mid_game_state.get_event(event)
         self.players_ui.get_event(event, self.board_gui.board)
+        # check for draw
+        if self.players_ui.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED]:
+            self._checks_between_moves()
 
     def update(self, dt):
         if self.mid_game_state.quit:
@@ -148,15 +151,6 @@ class MidGame(BaseState):
         """
         Checks if the game is over or if the next player is in check.
         """
-        # next state
-        if self.mid_game_state_name == MidGameState.PLAYERS_1_TURN:
-            self.mid_game_state.next_state = MidGameState.PLAYERS_2_TURN
-        elif self.mid_game_state_name == MidGameState.PLAYERS_2_TURN:
-            self.mid_game_state.next_state = MidGameState.PLAYERS_1_TURN
-        # rotate board
-        if not self.persist[PersistentDataKeys.SINGLE_PLAYER]:
-            self.mid_game_state.board_gui.rotate_board()
-
         # get ui stuff
         self.mid_game_state.mid_game_persist = self.players_ui.mid_game_persist
 
@@ -166,6 +160,7 @@ class MidGame(BaseState):
             self.persist[PersistentDataKeys.OUTCOME] = outcome
             self.next_state = GameState.POST_GAME
             self.done = True
+            return
 
         # check forfeit
         if self._get_mid_game_persist(MidGamePersistentDataKeys.FORFEIT):
@@ -173,6 +168,7 @@ class MidGame(BaseState):
                                                                      self.mid_game_state.color.value)
             self.next_state = GameState.POST_GAME
             self.done = True
+            return
 
         # check old draw offer
         draw_offered = self._get_mid_game_persist(MidGamePersistentDataKeys.DRAW_OFFERED)
@@ -185,11 +181,22 @@ class MidGame(BaseState):
             self.persist[PersistentDataKeys.OUTCOME] = chess.Outcome(chess.Termination.VARIANT_DRAW, None)
             self.next_state = GameState.POST_GAME
             self.done = True
+            return
         # draw claimed
         elif not draw_offered and draw_accepted:
             self.persist[PersistentDataKeys.OUTCOME] = chess.Outcome(chess.Termination.VARIANT_DRAW, None)
             self.next_state = GameState.POST_GAME
             self.done = True
+            return
+
+        # next state
+        if self.mid_game_state_name == MidGameState.PLAYERS_1_TURN:
+            self.mid_game_state.next_state = MidGameState.PLAYERS_2_TURN
+        elif self.mid_game_state_name == MidGameState.PLAYERS_2_TURN:
+            self.mid_game_state.next_state = MidGameState.PLAYERS_1_TURN
+        # rotate board
+        if not self.persist[PersistentDataKeys.SINGLE_PLAYER]:
+            self.mid_game_state.board_gui.rotate_board()
 
     def _set_mid_game_persist(self, key: MidGamePersistentDataKeys, value: object) -> None:
         """
