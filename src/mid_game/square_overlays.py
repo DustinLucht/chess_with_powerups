@@ -4,7 +4,8 @@ Overlay class.
 import pygame
 
 from config.globals import CHESS_BOARD_COLORS
-from src.enums import OverlayType
+from src.enums import OverlayType, PowerUpTypes
+from src.mid_game.power_ups import PowerUp
 
 COLOR_SCHEME = {
     OverlayType.SELECTED_FIGURE: pygame.Color("yellow"),
@@ -113,11 +114,13 @@ class SquareOverlayPowerUp(SquareOverlay):
     SquareOverlayPowerUp class.
     """
     image_path: str
+    powerup: PowerUp
 
     def __init__(self, overlay_type: OverlayType, center_pos: tuple[int, int], square_size: int, square_id: int,
-                 image_path: str):
+                 image_path: str, powerup: PowerUp):
         super().__init__(overlay_type, center_pos, square_size, square_id)
         x, y = center_pos
+        self.powerup = powerup
         self.image_path = image_path
         self.overlay_rect = pygame.Rect(x, y, square_size, square_size)
         self._create_overlay_surface_base(square_size)
@@ -160,8 +163,8 @@ class SquareOverlayPowerUp(SquareOverlay):
         Gives the powerup to a green edge.
         """
         self.overlay_surface.fill(CHESS_BOARD_COLORS[1])
-        self._update_overlay_with_edges()
         self._update_overlay_with_figure(self.overlay_rect.width)
+        self._update_overlay_with_edges()
 
 
 class SquareOverlayPowerupBackground(SquareOverlay):

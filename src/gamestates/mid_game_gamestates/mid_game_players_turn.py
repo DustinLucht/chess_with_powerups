@@ -1,13 +1,16 @@
 """
 This module contains the MidGamePlayersTurn class.
 """
+import random
+
 import pygame
 import chess
-from src.enums import ChessColor, OverlayType
+from src.enums import ChessColor, OverlayType, PowerUpTypes
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.mid_game.chess_board_figure import ChessBoardFigure
 from src.mid_game.chess_board_gui import ChessBoardGui
 from src.mid_game.player import Player
+from src.mid_game.power_ups import PowerUp
 
 
 class MidGamePlayersTurn(MidGameBaseState):
@@ -20,10 +23,12 @@ class MidGamePlayersTurn(MidGameBaseState):
     time_clicked: float
     button_down: bool
     wait_for_separate_player_input: bool
+    second_move: bool
 
     def __init__(self, color: ChessColor, players_name: str, board: chess.Board, board_gui: ChessBoardGui):
         super(MidGamePlayersTurn, self).__init__(color)
         # init vars
+        self.second_move = False
         self.is_figure_dragging: bool = False
         self.id_square_selected: int = 0
         self.player: Player = Player(players_name, color)
@@ -37,6 +42,7 @@ class MidGamePlayersTurn(MidGameBaseState):
     def startup(self, mid_game_persistent):
         super(MidGamePlayersTurn, self).startup(mid_game_persistent)
         self.board_gui.set_figures_according_to_board()
+        self.second_move = False
 
     def get_event(self, event):
         if self.wait_for_separate_player_input:
@@ -69,6 +75,22 @@ class MidGamePlayersTurn(MidGameBaseState):
         if self.time_clicked > 200 and self.button_down:
             self._handle_long_mousebuttondown(pygame.mouse.get_pos())
             self.button_down = False
+
+    def get_player_or_none(self):
+        """
+        Gets the player or none.
+        :return: None
+        """
+        return self.player
+
+    def activate_powerup(self, powerup):
+        super(MidGamePlayersTurn, self).activate_powerup(powerup)
+        switcher = {
+            PowerUpTypes.DESTROY: self._activate_powerup_destroy,
+            PowerUpTypes.AI_HELPS: self._activate_powerup_ai_helps,
+            PowerUpTypes.RANDOM_PROMOTION: self._activate_powerup_random_promotion,
+        }
+        switcher.get(powerup.power_up_type, lambda: None)()
 
     def handle_peasant_promotion(self, mouse_pos: tuple[int, int]) -> None:
         """
@@ -226,11 +248,50 @@ class MidGamePlayersTurn(MidGameBaseState):
         :return:
         """
         self.board_gui.set_figures_according_to_board()
+        if self.active_powerup is not None:
+            if self.active_powerup.power_up_type == PowerUpTypes.DOUBLE_MOVE:
+                self.second_move = True
+                self.active_powerup = None
+                self.board.push(chess.Move.null())
+                return
         self.done = True
 
-    def get_player_or_none(self):
+    def _activate_powerup_destroy(self):
         """
-        Gets the player or none.
+        Activates the power-up destroy.
         :return: None
         """
-        return self.player
+        self.active_powerup = None
+        # choose random figure
+        opponent_color = ChessColor.WHITE if self.color == ChessColor.BLACK else ChessColor.BLACK
+        # get all piece from self.board.piece_map()
+        opponent_figures = []
+        for square_id in self.board.piece_map():
+            if self.board.piece_at(square_id).color == opponent_color.value:
+                # if not king
+                if self.board.piece_at(square_id).piece_type != chess.KING:
+                    opponent_figures.append(square_id)
+        # choose random figure
+        if len(opponent_figures) == 0:
+            return
+        random_item = random.choice(opponent_figures)
+        # remove figure from board
+        self.board.remove_piece_at(random_item)
+        self.board_gui.set_figures_according_to_board()
+
+    def _activate_powerup_ai_helps(self):
+        """
+        Activates the power-up ai helps.
+        :return: None
+        """
+        self.active_powerup = None
+        # self.board_gui.set_figures_according_to_board()
+        # self.done = True
+
+    def _activate_powerup_random_promotion(self):
+        """
+        Activates the power-up random promotion.
+        :return: None
+        """
+        self.active_powerup = None
+        # self.board_gui.set_figures_according_to_board()

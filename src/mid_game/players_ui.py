@@ -87,7 +87,7 @@ class PlayersUI:
                 self.powerups.append(SquareOverlayPowerUp(
                     OverlayType.POWERUP,
                     (self.size[0] - (i + 1) * (square_size + 5), self.starting_coordinate[1] + 5),
-                    square_size, 0, POWERUPS_IMAGE_PATHS[powerup.power_up_type]))
+                    square_size, 0, POWERUPS_IMAGE_PATHS[powerup.power_up_type], powerup))
 
     def get_event(self, event: pygame.event.Event, activate_powerup_function: callable) -> None:
         """
@@ -99,14 +99,13 @@ class PlayersUI:
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     if not self.powerup_is_active:
-                        for i in range(4):
-                            if self.background[i].overlay_rect.collidepoint(event.pos):
-                                if len(self.powerups) < i:
-                                    activate_powerup_function(self.player.get_powerup(i))
-                                    self.player.use_powerup(i)
-                                    self.powerups[i].activate_powerup()
-                                    self.powerup_is_active = True
-                                    break
+                        for powerup_overlay in self.powerups:
+                            if powerup_overlay.overlay_rect.collidepoint(event.pos):
+                                activate_powerup_function(powerup_overlay.powerup)
+                                self.player.use_powerup(powerup_overlay.powerup)
+                                powerup_overlay.activate_powerup()
+                                self.powerup_is_active = True
+                                break
                     if self.offer_rect.collidepoint(event.pos):
                         if self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] is None:
                             self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] = self.player.color

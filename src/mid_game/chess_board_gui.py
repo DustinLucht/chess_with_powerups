@@ -92,6 +92,16 @@ class ChessBoardGui:
         # Clean all overlays
         self.overlays.clear()
 
+    def _invert_colors(self):
+        """
+        Inverts the color of all pieces on the board.
+        """
+        for square in chess.SQUARES:
+            piece = self.board.piece_at(square)
+            if piece:
+                # Set the piece on the board to its opposite color
+                self.board.set_piece_at(square, piece, not piece.color)
+
     def set_selected_square(self, square_id: int) -> None:
         """
         Sets the selected square.
@@ -100,24 +110,25 @@ class ChessBoardGui:
         # clean all overlays
         self.overlays.clear()
 
-        # add the selected figure overlay
+        # Add the selected figure overlay
         self.overlays.append(SquareOverlayMove(OverlayType.SELECTED_FIGURE,
                                                self._get_square_coordinates_for_centered_figure(
                                                    chess.square_name(square_id), self.square_size),
                                                self.square_size, square_id))
-        # add all possible moves
+
+        # Generate and add all possible moves from this position
         for move in self.board.legal_moves:
+            destination_square = move.to_square
             if move.from_square == square_id:
-                if self.board.piece_at(move.to_square) is None:
-                    self.overlays.append(SquareOverlayMove(OverlayType.POSSIBLE_MOVE_NORMAL,
-                                                           self._get_square_coordinates_for_centered_figure(
-                                                               chess.square_name(move.to_square), self.square_size),
-                                                           self.square_size, move.to_square))
+                if self.board.piece_at(destination_square) is None:
+                    overlay_type = OverlayType.POSSIBLE_MOVE_NORMAL
                 else:
-                    self.overlays.append(SquareOverlayMove(OverlayType.POSSIBLE_MOVE_ATTACK,
-                                                           self._get_square_coordinates_for_centered_figure(
-                                                               chess.square_name(move.to_square), self.square_size),
-                                                           self.square_size, move.to_square))
+                    overlay_type = OverlayType.POSSIBLE_MOVE_ATTACK
+
+                self.overlays.append(SquareOverlayMove(overlay_type,
+                                                       self._get_square_coordinates_for_centered_figure(
+                                                           chess.square_name(destination_square), self.square_size),
+                                                       self.square_size, destination_square))
 
     def set_peasant_promotion_overlay(self, square_id: int, player_color: ChessColor) -> None:
         """
