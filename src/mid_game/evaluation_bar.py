@@ -5,6 +5,8 @@ import chess
 import chess.engine
 import pygame
 
+from config.globals import ENGINE_PATH
+
 COLOR_WHITE = pygame.Color(255, 255, 255)
 COLOR_BLACK = pygame.Color(0, 0, 0)
 PIECE_VALUES = {
@@ -88,7 +90,7 @@ class EvaluationBar:
         # init overlay rects
         self._update_overlay_rects()
         # Load Stockfish engine
-        self.engine = chess.engine.SimpleEngine.popen_uci(r"..\assets\stockfish\stockfish-windows-x86-64-avx2.exe")
+        self.engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
 
     def _update_full_overlay_with_edges(self) -> None:
         """

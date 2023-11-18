@@ -111,7 +111,8 @@ class PlayersUI:
                             self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] = self.player.color
                             self.draw_offered_in_last_turn = False
                     if self.accept_rect.collidepoint(event.pos):
-                        self.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED] = True
+                        if self.mid_game_persist[MidGamePersistentDataKeys.DRAW_OFFERED] is not None:
+                            self.mid_game_persist[MidGamePersistentDataKeys.DRAW_ACCEPTED] = True
 
     def get_current_score(self) -> float:
         """

@@ -2,9 +2,13 @@
 This module contains the MidGamePlayersTurn class.
 """
 import random
+import threading
 
 import pygame
 import chess
+import chess.engine
+
+from config.globals import ENGINE_PATH
 from src.enums import ChessColor, OverlayType, PowerUpTypes
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.mid_game.chess_board_figure import ChessBoardFigure
@@ -285,8 +289,8 @@ class MidGamePlayersTurn(MidGameBaseState):
         :return: None
         """
         self.active_powerup = None
-        # self.board_gui.set_figures_according_to_board()
-        # self.done = True
+        self.engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
+        self._make_ai_helps_move()
 
     def _activate_powerup_random_promotion(self):
         """
@@ -294,4 +298,42 @@ class MidGamePlayersTurn(MidGameBaseState):
         :return: None
         """
         self.active_powerup = None
-        # self.board_gui.set_figures_according_to_board()
+        # choose random figure
+        color = ChessColor.WHITE if self.color == ChessColor.WHITE else ChessColor.BLACK
+        # get all piece from self.board.piece_map()
+        figures = []
+        for square_id in self.board.piece_map():
+            if self.board.piece_at(square_id).color == color.value:
+                # if not king
+                if self.board.piece_at(square_id).piece_type == chess.PAWN:
+                    figures.append(square_id)
+        # choose random figure
+        if len(figures) == 0:
+            return
+        random_item = random.choice(figures)
+        # promote figure to random figure
+        possible_promotions = [chess.QUEEN, chess.ROOK, chess.BISHOP, chess.KNIGHT]
+        promotion = random.choice(possible_promotions)
+        self.board.set_piece_at(random_item, chess.Piece(promotion, color.value))
+        self.board_gui.set_figures_according_to_board()
+
+    def _ai_helps_play(self, board, time_limit, queue):
+        result = self.engine.play(board, chess.engine.Limit(time=time_limit))
+        queue.put(result)
+
+    def _callback(self, result):
+        self.id_square_selected = result.move.from_square
+        self.board_gui.set_selected_move(result.move)
+        self.engine.close()
+
+    def _make_ai_helps_move(self):
+        """
+        Makes the AI move in a separate thread.
+        """
+        # Set the AI's thinking time based on the difficulty
+        thread = threading.Thread(target=self._ai_helps_play_threaded, args=(self.board, 4))
+        thread.start()
+
+    def _ai_helps_play_threaded(self, board, time_limit):
+        result = self.engine.play(board, chess.engine.Limit(time=time_limit))
+        self._callback(result)

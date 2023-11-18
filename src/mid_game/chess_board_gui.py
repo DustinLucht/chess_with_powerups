@@ -130,6 +130,26 @@ class ChessBoardGui:
                                                            chess.square_name(destination_square), self.square_size),
                                                        self.square_size, destination_square))
 
+    def set_selected_move(self, move: chess.Move) -> None:
+        """
+        Sets the selected move.
+        :param move: Move
+        """
+        # clean all overlays
+        self.overlays.clear()
+
+        # Add the selected figure overlay
+        self.overlays.append(SquareOverlayMove(OverlayType.SELECTED_FIGURE,
+                                               self._get_square_coordinates_for_centered_figure(
+                                                   chess.square_name(move.from_square), self.square_size),
+                                               self.square_size, move.from_square))
+
+        # Add the selected move overlay
+        self.overlays.append(SquareOverlayMove(OverlayType.POSSIBLE_MOVE_ATTACK,
+                                               self._get_square_coordinates_for_centered_figure(
+                                                   chess.square_name(move.to_square), self.square_size),
+                                               self.square_size, move.to_square))
+
     def set_peasant_promotion_overlay(self, square_id: int, player_color: ChessColor) -> None:
         """
         Sets the selected square.

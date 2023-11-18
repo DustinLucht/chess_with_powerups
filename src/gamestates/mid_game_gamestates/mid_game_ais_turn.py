@@ -5,6 +5,7 @@ import chess
 import chess.engine
 import threading
 
+from config.globals import ENGINE_PATH
 from src.enums import ChessColor
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.mid_game.chess_board_gui import ChessBoardGui
@@ -24,7 +25,7 @@ class MidGameAIsTurn(MidGameBaseState):
         self.board = board
         self.board_gui = board_gui
         # Load Stockfish engine
-        self.engine = chess.engine.SimpleEngine.popen_uci(r"..\assets\stockfish\stockfish-windows-x86-64-avx2.exe")
+        self.engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
 
     def startup(self, mid_game_persistent):
         super(MidGameAIsTurn, self).startup(mid_game_persistent)
