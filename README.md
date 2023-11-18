@@ -1,5 +1,6 @@
 # chess_with_powerups
 Software Engineering
 
-Kleine Bilder: https://opengameart.org/content/chess-pieces-and-board-squares
-Background: shutterstock.com/g/grstocks
+Hintergrundbild: https://www.shutterstock.com/de/g/grstocks \
+Schachfiguren: https://www.craiyon.com/ \
+Kleine Bilder (Powerups): https://opengameart.org/content/chess-pieces-and-board-squares \

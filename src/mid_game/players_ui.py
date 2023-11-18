@@ -9,7 +9,6 @@ from src.mid_game.evaluation_bar import EvaluationBar
 from src.mid_game.player import Player
 from src.mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
 
-# TODO https://www.craiyon.com/
 POWERUPS_IMAGE_PATHS = {
     PowerUpTypes.DESTROY: r"..\assets\images\powerups\craiyon_184052_chess_pawn_logo_on_fire_with_dark_background.png",
     PowerUpTypes.DOUBLE_MOVE: r"..\assets\images\powerups\craiyon_184729_black_chess_pawn_with_a__2x__marking.png",
