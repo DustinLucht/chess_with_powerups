@@ -1,6 +1,13 @@
 @startuml
 
 namespace enums {
+    enum GlobalConstants {
+	  X_SCREEN_SIZE
+	  Y_SCREEN_SIZE
+	  SQUARE_SIZE_MULTIPLIER
+	  PIECES_SIZE
+    }
+
     enum GameState {
       SPLASH
       MENU
@@ -19,28 +26,32 @@ namespace enums {
 
     enum PersistentDataKeys {
       BACKGROUND_IMAGE
-      SINGLE_PLAYER
-      STARTS_WITH_WHITE
-      DIFFICULTY
-      POWER_UP_MULTIPLICATOR
-      OUTCOME
+	  SINGLE_PLAYER
+	  STARTS_WITH_WHITE
+	  DIFFICULTY
+	  POWER_UP_MULTIPLICATOR
+	  OUTCOME
+	  BOARD_GUI
     }
 
     enum MidGamePersistentDataKeys {
       CURRENT_TURN
-      DRAW_OFFERED
-      DRAW_ACCEPTED
-      FORFEIT
+	  DRAW_OFFERED
+	  DRAW_ACCEPTED
+	  FORFEIT
+	  RESTART
     }
 
     enum OverlayType {
       SELECTED_FIGURE
-      POSSIBLE_MOVE_NORMAL
-      POSSIBLE_MOVE_ATTACK
-      PROMOTION_QUEEN
-      PROMOTION_ROOK
-      PROMOTION_BISHOP
-      PROMOTION_KNIGHT
+	  POSSIBLE_MOVE_NORMAL
+	  POSSIBLE_MOVE_ATTACK
+	  PROMOTION_QUEEN
+	  PROMOTION_ROOK
+	  PROMOTION_BISHOP
+	  PROMOTION_KNIGHT
+	  BACKGROUND
+	  POWERUP
     }
 
     enum ChessColor {
@@ -49,8 +60,10 @@ namespace enums {
     }
 
     enum PowerUpTypes {
-      FREEZE
-      DOUBLE_MOVE
+      DESTROY
+	  DOUBLE_MOVE
+	  AI_HELPS
+	  RANDOM_PROMOTION
     }
 }
 
@@ -239,6 +252,48 @@ namespace midgame {
 
     ChessBoardGui "1" o-- "n" ChessBoardFigure
 
+	class EvaluationBar {
+		- evaluation_value
+		- starting_coordinate
+		- size
+		- overlay_rect_white
+		- overlay_surface_white
+		- overlay_rect_black
+		- overlay_surface_black
+		- overlay_rect_full
+		- overlay_surface_full
+		- evaluation_thread
+		- evaluation_is_active
+		- engine
+		+ __init__(starting_coordinate, size)
+		+ _update_full_overlay_with_edges()
+		+ _update_overlay_rects()
+		+ _update_overlay_surfaces()
+		+ _update_evaluation_threaded(board, time)
+		+ _evaluation_callback(score)
+		+ update_evaluation(board)
+		+ draw(surface)
+	}
+
+	class PlayersUI {
+		- player
+		- mid_game_persist
+		- starting_coordinate
+		- size
+		- background
+		- powerups
+		- powerup_is_active
+		- draw_offered_in_last_turn
+		- evaluation_bar
+		+ __init__(starting_coordinate, size)
+		+ change_player(mid_game_persistent, player)
+		+ get_event(event, activate_powerup_function)
+		+ get_current_score()
+		+ draw(surface)
+		+ update_evaluation(board)
+		+ _draw_offer(surface)
+	}
+
     class ChessBoardGui {
         - board
         - square_size
@@ -320,6 +375,23 @@ namespace midgame {
       + _update_overlay_with_edges()
       + _update_overlay_with_figure(square_size)
     }
+
+	class SquareOverlayPowerupBackground {
+	  - overlay_color
+	  + __init__(overlay_type, center_pos, square_size, square_id)
+	  + draw(surface)
+	}
+
+	class SquareOverlayPowerUp {
+	  - image_path
+	  - powerup
+	  + __init__(overlay_type, center_pos, square_size, square_id, image_path, powerup)
+	  + draw(surface)
+	  + _create_overlay_surface_base(square_size)
+	  + _update_overlay_with_figure(square_size)
+	  + _update_overlay_with_edges()
+	  + activate_powerup()
+	}
 }
 
 ' Vererbungenen
@@ -336,12 +408,14 @@ PowerUp <|-- FreezePowerUp
 PowerUp <|-- DoubleMovePowerUp
 SquareOverlay <|-- SquareOverlayMove
 SquareOverlay <|-- SquareOverlayPromotion
+SquareOverlay <|-- SquareOverlayPowerUp
+SquareOverlay <|-- SquareOverlayPowerupBackground
 
-' Nutzen
 Game "1" o-- "n" gamestates.BaseState
 midgame.Player "1" o-- "n" midgame.PowerUp
 gamestates.midgame.MidGamePlayersTurn "1" o--  "1" midgame.Player
 gamestates.midgame.MidGameBaseState "1" o-- "1" midgame.ChessBoardGui
 gamestates.MidGame "1" o-- "n" gamestates.midgame.MidGameBaseState
+PlayersUI "1" o-- "1" EvaluationBar
 
 @enduml
