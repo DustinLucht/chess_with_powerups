@@ -168,28 +168,44 @@ class MidGame(BaseState):
             if current_score >= 0.1:
                 player.add_powerup(self.get_random_powerup_or_none())
 
-    def get_random_powerup_or_none(self) -> PowerUp | None:
+    def get_random_powerup_or_none(self, power_up_weights=None) -> PowerUp | None:
         """
-        Gets a random powerup or None.
+        Gets a random powerup or None, with individual probabilities for each powerup.
+        :param power_up_weights: Dictionary with PowerUpTypes as keys and their weights as values.
         :return: random powerup or None
         """
         multiplier = self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR]
         probability = multiplier / 10  # Convert the multiplier into a probability between 0.1 and 1.0
 
+        # Default weights if none provided
+        if power_up_weights is None:
+            power_up_weights = {
+                PowerUpTypes.DESTROY: 0.5,
+                PowerUpTypes.DOUBLE_MOVE: 0.5,  # Double move is less likely
+                PowerUpTypes.AI_HELPS: 1,
+                PowerUpTypes.RANDOM_PROMOTION: 0.8
+            }
+
         # If a random number is less than the probability, we give a power-up
         if random.random() < probability:
-            power_up_choice = random.choice(list(PowerUpTypes))
+            total_weight = sum(power_up_weights.values())
+            random_choice = random.uniform(0, total_weight)
+            cumulative_weight = 0
 
-            if power_up_choice == PowerUpTypes.DESTROY:
-                return DestroyPowerUp()
-            elif power_up_choice == PowerUpTypes.DOUBLE_MOVE:
-                return DoubleMovePowerUp()
-            elif power_up_choice == PowerUpTypes.AI_HELPS:
-                return AIHelpsPowerUp()
-            elif power_up_choice == PowerUpTypes.RANDOM_PROMOTION:
-                return RandomPromotionPowerUp()
-        else:
-            return None
+            for power_up_type, weight in power_up_weights.items():
+                cumulative_weight += weight
+                if random_choice <= cumulative_weight:
+                    if power_up_type == PowerUpTypes.DESTROY:
+                        return DestroyPowerUp()
+                    elif power_up_type == PowerUpTypes.DOUBLE_MOVE:
+                        return DoubleMovePowerUp()
+                    elif power_up_type == PowerUpTypes.AI_HELPS:
+                        return AIHelpsPowerUp()
+                    elif power_up_type == PowerUpTypes.RANDOM_PROMOTION:
+                        return RandomPromotionPowerUp()
+                    break
+
+        return None
 
     def _checks_between_moves(self) -> None:
         """
