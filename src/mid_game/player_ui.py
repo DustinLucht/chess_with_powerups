@@ -18,7 +18,7 @@ POWERUPS_IMAGE_PATHS = {
 }
 
 
-class PlayersUI:
+class PlayerUI:
     """
     This class represents the mid game players ui.
     """

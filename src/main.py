@@ -11,7 +11,6 @@ from src.gamestates.menu import Menu
 from src.gamestates.mid_game import MidGame
 from src.gamestates.post_game import PostGame
 from src.gamestates.pre_game import PreGame
-from src.gamestates.settings import Settings
 from src.gamestates.splash import Splash
 
 
@@ -22,7 +21,6 @@ if __name__ == "__main__":
     states = {
         GameState.SPLASH: Splash(),
         GameState.MENU: Menu(),
-        GameState.SETTINGS: Settings(),
         GameState.PRE_GAME: PreGame(),
         GameState.MID_GAME: MidGame(),
         GameState.POST_GAME: PostGame(),

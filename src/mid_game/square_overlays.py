@@ -4,7 +4,7 @@ Overlay class.
 import pygame
 
 from config.globals import CHESS_BOARD_COLORS
-from src.enums import OverlayType, PowerUpTypes
+from src.enums import OverlayType
 from src.mid_game.power_ups import PowerUp
 
 COLOR_SCHEME = {

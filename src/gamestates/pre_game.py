@@ -14,8 +14,8 @@ class PreGame(BaseState):
     """
     This class represents the pre game.
     """
-    textbox_multiplayer_render: pygame.Surface
-    toggle_multiplayer: Toggle
+    textbox_com_render: pygame.Surface
+    toggle_com: Toggle
     textbox_starts_render: pygame.Surface
     toggle_playing_as: Toggle
     textbox_difficulty_render: pygame.Surface
@@ -28,10 +28,10 @@ class PreGame(BaseState):
     def __init__(self):
         super(PreGame, self).__init__()
         # UI Elemente
-        self.textbox_multiplayer_render = self.font.render("Mehrspieler: Aus", True, (255, 255, 255))
-        self.toggle_multiplayer = Toggle(pygame.display.get_surface(), 1000, 100, 200, 40,
-                                         fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
-                                         handleColour=(150, 150, 150), handleRadius=18, initial=True)
+        self.textbox_com_render = self.font.render("Spiel gegen Stockfish", True, (255, 255, 255))
+        self.toggle_com = Toggle(pygame.display.get_surface(), 1000, 100, 200, 40,
+                                 fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
+                                 handleColour=(150, 150, 150), handleRadius=18, initial=True)
         self.textbox_starts_render = self.font.render("Du spielst als: weiß", True, (255, 255, 255))
         self.toggle_playing_as = Toggle(pygame.display.get_surface(), 1000, 250, 200, 40,
                                         fontSize=30, textColour=(255, 255, 255), inactiveColour=(0, 0, 150),
@@ -61,19 +61,21 @@ class PreGame(BaseState):
         self.background_image = persistent[PersistentDataKeys.BACKGROUND_IMAGE]
         self.background_rect: pygame.Rect = self.background_image.get_rect(center=self.screen_rect.center)
         self.next_state = GameState.MID_GAME
+        if not self.toggle_com.getValue():
+            self.toggle_com.toggle()
         self._set_persist()
-        #self.done = True
 
     def draw(self, surface):
         surface.fill(pygame.Color("black"))
         surface.blit(self.background_image, self.background_rect)
 
-        surface.blit(self.textbox_multiplayer_render, (1000, 50))
-        self.toggle_multiplayer.draw()
-        surface.blit(self.textbox_starts_render, (1000, 200))
-        self.toggle_playing_as.draw()
-        surface.blit(self.textbox_difficulty_render, (1000, 350))
-        self.slider_difficulty.draw()
+        surface.blit(self.textbox_com_render, (1000, 50))
+        self.toggle_com.draw()
+        if self.toggle_com.getValue():
+            surface.blit(self.textbox_starts_render, (1000, 200))
+            self.toggle_playing_as.draw()
+            surface.blit(self.textbox_difficulty_render, (1000, 350))
+            self.slider_difficulty.draw()
         surface.blit(self.textbox_power_up_multiplier, (1000, 500))
         self.slider_power_up_multiplier.draw()
         self.button_back.draw()
@@ -84,8 +86,8 @@ class PreGame(BaseState):
             self.quit = True
 
     def update(self, dt):
-        self.textbox_multiplayer_render = self._get_text_render(
-            f"Mehrspieler:  {'An' if self.toggle_multiplayer.getValue() else 'Aus'}")
+        self.textbox_com_render = self._get_text_render(
+            'Spiel gegen Stockfish' if self.toggle_com.getValue() else 'Spiel gegen einen Freund')
         self.textbox_starts_render = self._get_text_render(
             f"Du spielst als:  {'weiß' if self.toggle_playing_as.getValue() else 'schwarz'}")
         self.textbox_difficulty_render = self._get_text_render(
@@ -117,7 +119,7 @@ class PreGame(BaseState):
         """
         Starts the game.
         """
-        self.persist[PersistentDataKeys.SINGLE_PLAYER] = not self.toggle_multiplayer.getValue()
+        self.persist[PersistentDataKeys.SINGLE_PLAYER] = self.toggle_com.getValue()
         self.persist[PersistentDataKeys.STARTS_WITH_WHITE] = self.toggle_playing_as.getValue()
         self.persist[PersistentDataKeys.DIFFICULTY] = self.slider_difficulty.getValue() / 5000
         self.persist[PersistentDataKeys.POWER_UP_MULTIPLICATOR] = self.slider_power_up_multiplier.getValue()

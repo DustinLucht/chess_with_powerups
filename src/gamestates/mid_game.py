@@ -12,10 +12,10 @@ from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersi
 from src.gamestates.base import BaseState
 from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.gamestates.mid_game_gamestates.mid_game_pause import MidGamePause
-from src.gamestates.mid_game_gamestates.mid_game_ais_turn import MidGameAIsTurn
-from src.gamestates.mid_game_gamestates.mid_game_players_turn import MidGamePlayersTurn
+from src.gamestates.mid_game_gamestates.mid_game_ai_turn import MidGameAiTurn
+from src.gamestates.mid_game_gamestates.mid_game_player_turn import MidGamePlayerTurn
 from src.mid_game.chess_board_gui import ChessBoardGui
-from src.mid_game.players_ui import PlayersUI
+from src.mid_game.player_ui import PlayerUI
 from src.mid_game.power_ups import PowerUp, DestroyPowerUp, DoubleMovePowerUp, AIHelpsPowerUp, RandomPromotionPowerUp
 
 SQUARE_SIZE = int(GlobalConstants.Y_SCREEN_SIZE.value * GlobalConstants.SQUARE_SIZE_MULTIPLIER.value)
@@ -29,7 +29,7 @@ class MidGame(BaseState):
     mid_game_states: dict[MidGameState, MidGameBaseState]
     mid_game_state_name: MidGameState
     mid_game_state: MidGameBaseState
-    players_ui: PlayersUI
+    players_ui: PlayerUI
     board_gui: ChessBoardGui
 
     def __init__(self):
@@ -41,8 +41,8 @@ class MidGame(BaseState):
         self.mid_game_state: MidGameBaseState = self.mid_game_states[self.mid_game_state_name]
         board: chess.Board = chess.Board()
         self.board_gui = ChessBoardGui(board, SQUARE_SIZE, PIECES_SIZE)
-        self.players_ui = PlayersUI((SQUARE_SIZE * 8, 0), (GlobalConstants.X_SCREEN_SIZE.value,
-                                                           GlobalConstants.Y_SCREEN_SIZE.value))
+        self.players_ui = PlayerUI((SQUARE_SIZE * 8, 0), (GlobalConstants.X_SCREEN_SIZE.value,
+                                                          GlobalConstants.Y_SCREEN_SIZE.value))
 
     def startup(self, persistent):
         super(MidGame, self).startup(persistent)
@@ -59,29 +59,29 @@ class MidGame(BaseState):
         if self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             # start with white
             if self.persist[PersistentDataKeys.STARTS_WITH_WHITE]:
-                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE, "Player 1",
-                                                                                       board, self.board_gui)
-                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGameAIsTurn(ChessColor.BLACK,
-                                                                                   float(self.persist[
+                self.mid_game_states[MidGameState.TURN_PLAYER_1] = MidGamePlayerTurn(ChessColor.WHITE, "Player 1",
+                                                                                      board, self.board_gui)
+                self.mid_game_states[MidGameState.TURN_PLAYER_2] = MidGameAiTurn(ChessColor.BLACK,
+                                                                                 float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui)
+                                                                                 board, self.board_gui)
             # start with black
             else:
                 self.board_gui.rotate_board()
-                self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGameAIsTurn(ChessColor.WHITE,
-                                                                                   float(self.persist[
+                self.mid_game_states[MidGameState.TURN_PLAYER_1] = MidGameAiTurn(ChessColor.WHITE,
+                                                                                 float(self.persist[
                                                                                              PersistentDataKeys.DIFFICULTY]),
-                                                                                   board, self.board_gui)
-                self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 1",
-                                                                                       board, self.board_gui)
+                                                                                 board, self.board_gui)
+                self.mid_game_states[MidGameState.TURN_PLAYER_2] = MidGamePlayerTurn(ChessColor.BLACK, "Player 1",
+                                                                                      board, self.board_gui)
         # multi player
         else:
-            self.mid_game_states[MidGameState.PLAYERS_1_TURN] = MidGamePlayersTurn(ChessColor.WHITE, "Player 1", board,
-                                                                                   self.board_gui)
-            self.mid_game_states[MidGameState.PLAYERS_2_TURN] = MidGamePlayersTurn(ChessColor.BLACK, "Player 2", board,
-                                                                                   self.board_gui)
+            self.mid_game_states[MidGameState.TURN_PLAYER_1] = MidGamePlayerTurn(ChessColor.WHITE, "Player 1", board,
+                                                                                  self.board_gui)
+            self.mid_game_states[MidGameState.TURN_PLAYER_2] = MidGamePlayerTurn(ChessColor.BLACK, "Player 2", board,
+                                                                                  self.board_gui)
         # set first state
-        self.mid_game_state_name = MidGameState.PLAYERS_1_TURN
+        self.mid_game_state_name = MidGameState.TURN_PLAYER_1
         self.mid_game_state = self.mid_game_states[self.mid_game_state_name]
         # set data and start
         mid_game_persist = {
@@ -253,10 +253,10 @@ class MidGame(BaseState):
             return
 
         # next state
-        if self.mid_game_state_name == MidGameState.PLAYERS_1_TURN:
-            self.mid_game_state.next_state = MidGameState.PLAYERS_2_TURN
-        elif self.mid_game_state_name == MidGameState.PLAYERS_2_TURN:
-            self.mid_game_state.next_state = MidGameState.PLAYERS_1_TURN
+        if self.mid_game_state_name == MidGameState.TURN_PLAYER_1:
+            self.mid_game_state.next_state = MidGameState.TURN_PLAYER_2
+        elif self.mid_game_state_name == MidGameState.TURN_PLAYER_2:
+            self.mid_game_state.next_state = MidGameState.TURN_PLAYER_1
         # rotate board
         if not self.persist[PersistentDataKeys.SINGLE_PLAYER]:
             self.mid_game_state.board_gui.rotate_board()

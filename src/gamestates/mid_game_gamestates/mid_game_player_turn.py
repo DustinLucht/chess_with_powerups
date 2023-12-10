@@ -14,10 +14,9 @@ from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.mid_game.chess_board_figure import ChessBoardFigure
 from src.mid_game.chess_board_gui import ChessBoardGui
 from src.mid_game.player import Player
-from src.mid_game.power_ups import PowerUp
 
 
-class MidGamePlayersTurn(MidGameBaseState):
+class MidGamePlayerTurn(MidGameBaseState):
     """
     This class represents the mid game players turn.
     """
@@ -30,7 +29,7 @@ class MidGamePlayersTurn(MidGameBaseState):
     second_move: bool
 
     def __init__(self, color: ChessColor, players_name: str, board: chess.Board, board_gui: ChessBoardGui):
-        super(MidGamePlayersTurn, self).__init__(color)
+        super(MidGamePlayerTurn, self).__init__(color)
         # init vars
         self.second_move = False
         self.is_figure_dragging: bool = False
@@ -44,7 +43,7 @@ class MidGamePlayersTurn(MidGameBaseState):
         self.board_gui = board_gui
 
     def startup(self, mid_game_persistent):
-        super(MidGamePlayersTurn, self).startup(mid_game_persistent)
+        super(MidGamePlayerTurn, self).startup(mid_game_persistent)
         self.board_gui.set_figures_according_to_board()
         self.second_move = False
 
@@ -88,7 +87,7 @@ class MidGamePlayersTurn(MidGameBaseState):
         return self.player
 
     def activate_powerup(self, powerup):
-        super(MidGamePlayersTurn, self).activate_powerup(powerup)
+        super(MidGamePlayerTurn, self).activate_powerup(powerup)
         switcher = {
             PowerUpTypes.DESTROY: self._activate_powerup_destroy,
             PowerUpTypes.AI_HELPS: self._activate_powerup_ai_helps,

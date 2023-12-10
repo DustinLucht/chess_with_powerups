@@ -11,7 +11,7 @@ from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 from src.mid_game.chess_board_gui import ChessBoardGui
 
 
-class MidGameAIsTurn(MidGameBaseState):
+class MidGameAiTurn(MidGameBaseState):
     """
     This class represents the post game.
     """
@@ -19,7 +19,7 @@ class MidGameAIsTurn(MidGameBaseState):
     engine: chess.engine.SimpleEngine
 
     def __init__(self, color: ChessColor, ais_strength: float, board: chess.Board, board_gui: ChessBoardGui) -> None:
-        super(MidGameAIsTurn, self).__init__(color)
+        super(MidGameAiTurn, self).__init__(color)
         # init vars
         self.ais_strength = ais_strength
         self.board = board
@@ -28,7 +28,7 @@ class MidGameAIsTurn(MidGameBaseState):
         self.engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
 
     def startup(self, mid_game_persistent):
-        super(MidGameAIsTurn, self).startup(mid_game_persistent)
+        super(MidGameAiTurn, self).startup(mid_game_persistent)
         # Make the AI move in a separate process
         self._make_ai_move()
 

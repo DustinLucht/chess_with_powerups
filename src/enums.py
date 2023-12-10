@@ -16,17 +16,15 @@ class GameState(Enum):
     """Enum for the different states of the game."""
     SPLASH = 0
     MENU = 1
-    SETTINGS = 2
-    PRE_GAME = 3
-    MID_GAME = 4
-    PAUSE = 5
-    POST_GAME = 6
+    PRE_GAME = 2
+    MID_GAME = 3
+    POST_GAME = 4
 
 
 class MidGameState(Enum):
     """Enum for the different states of the mid game."""
-    PLAYERS_1_TURN = 0
-    PLAYERS_2_TURN = 1
+    TURN_PLAYER_1 = 0
+    TURN_PLAYER_2 = 1
     PAUSE = 2
 
 
