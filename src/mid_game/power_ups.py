@@ -3,7 +3,7 @@ This module contains the classes for the power-ups.
 """
 import chess
 
-from src.enums import PowerUpTypes
+from ..enums import PowerUpTypes
 
 
 class PowerUp:

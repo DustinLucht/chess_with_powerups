@@ -3,8 +3,8 @@ Game Over State
 """
 import pygame
 
-from src.enums import MidGamePersistentDataKeys
-from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
+from ...enums import MidGamePersistentDataKeys
+from ...gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
 
 
 class MidGamePause(MidGameBaseState):

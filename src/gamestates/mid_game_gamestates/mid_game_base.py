@@ -4,10 +4,10 @@ This module contains the base state.
 import chess
 import pygame
 
-from src.enums import MidGamePersistentDataKeys, MidGameState, ChessColor
-from src.mid_game.chess_board_gui import ChessBoardGui
-from src.mid_game.player import Player
-from src.mid_game.power_ups import PowerUp
+from ...enums import MidGamePersistentDataKeys, MidGameState, ChessColor
+from ...mid_game.chess_board_gui import ChessBoardGui
+from ...mid_game.player import Player
+from ...mid_game.power_ups import PowerUp
 
 
 class MidGameBaseState(object):

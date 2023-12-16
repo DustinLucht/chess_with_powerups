@@ -3,8 +3,8 @@ Pre Game State
 """
 import pygame
 
-from src.gamestates.base import BaseState
-from src.enums import GameState, PersistentDataKeys
+from ..gamestates.base import BaseState
+from ..enums import GameState, PersistentDataKeys
 from pygame_widgets.slider import Slider
 from pygame_widgets.toggle import Toggle
 from pygame_widgets.button import Button

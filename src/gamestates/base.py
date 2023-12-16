@@ -3,7 +3,7 @@ This module contains the base state.
 """
 import pygame
 
-from src.enums import GameState, PersistentDataKeys
+from ..enums import GameState, PersistentDataKeys
 
 
 class BaseState:

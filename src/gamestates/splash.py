@@ -2,8 +2,8 @@
 This module contains the Splash class.
 """
 import pygame
-from src.gamestates.base import BaseState
-from src.enums import GameState, PersistentDataKeys
+from ..gamestates.base import BaseState
+from ..enums import GameState, PersistentDataKeys
 
 
 class Splash(BaseState):
@@ -17,8 +17,7 @@ class Splash(BaseState):
         super(Splash, self).__init__()
         self.next_state = GameState.MENU
         self.time_active = 0
-        self.background_image = pygame.image.load(
-            "..\\assets\\images\\board\\gr-stocks-Iq9SaJezkOE-unsplash.jpg")
+        self.background_image = pygame.image.load("assets\\images\\board\\gr-stocks-Iq9SaJezkOE-unsplash.jpg")
         self.current_alpha = 0
         self.background_image = pygame.transform.scale(self.background_image, self.screen_rect.size)
         self.background_rect = self.background_image.get_rect(center=self.screen_rect.center)

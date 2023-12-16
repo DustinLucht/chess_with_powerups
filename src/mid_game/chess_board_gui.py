@@ -4,10 +4,10 @@ This module represents the chess board gui.
 import chess
 import pygame
 
-from config.globals import CHESS_BOARD_COLORS
-from src.enums import OverlayType, ChessColor
-from src.mid_game.chess_board_figure import ChessBoardFigure
-from src.mid_game.square_overlays import SquareOverlay, SquareOverlayMove, SquareOverlayPromotion
+from ..config.globals import CHESS_BOARD_COLORS
+from ..enums import OverlayType, ChessColor
+from ..mid_game.chess_board_figure import ChessBoardFigure
+from ..mid_game.square_overlays import SquareOverlay, SquareOverlayMove, SquareOverlayPromotion
 
 PIECES = {
     "b": "b_bishop_png_1024px.png",
@@ -52,7 +52,7 @@ class ChessBoardGui:
             figure = board.piece_at(square_id)
             if figure is not None:
                 self.active_pieces[square_id] = ChessBoardFigure(square_size * pieces_size_multiplier,
-                                                                 f"..\\assets\\images\\pieces\\"
+                                                                 f"assets\\images\\pieces\\"
                                                                  f"{PIECES[str(figure)]}",
                                                                  str(figure), chess.square_name(square_id),
                                                                  (0, 0))
@@ -78,7 +78,7 @@ class ChessBoardGui:
         for square, piece in current_pieces.items():
             if square not in self.active_pieces:
                 self.active_pieces[square] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
-                                                              f"..\\assets\\images\\pieces\\{PIECES[str(piece)]}",
+                                                              f"assets\\images\\pieces\\{PIECES[str(piece)]}",
                                                               str(piece), chess.square_name(square),
                                                               (0, 0))
 
@@ -168,7 +168,7 @@ class ChessBoardGui:
             # add the selected figure overlay
             self.overlays.append(
                 SquareOverlayPromotion(figure_to_promotion_enum[promotion_figure], current_center_pos, self.square_size,
-                                       square_id, f"..\\assets\\images\\pieces\\{PIECES[promotion_figure]}"))
+                                       square_id, f".assets\\images\\pieces\\{PIECES[promotion_figure]}"))
             current_center_pos = (current_center_pos[0], current_center_pos[1] + self.square_size)
 
     def set_figure_to_square(self, square_id: int, player_color: ChessColor, selected_promotion: OverlayType) -> None:
@@ -188,7 +188,7 @@ class ChessBoardGui:
             figure_str = "N" if player_color == ChessColor.WHITE else "n"
         # set the figure
         self.active_pieces[square_id] = ChessBoardFigure(self.square_size * self.pieces_size_multiplier,
-                                                         f"..\\assets\\images\\pieces\\{PIECES[figure_str]}",
+                                                         f"assets\\images\\pieces\\{PIECES[figure_str]}",
                                                          figure_str, chess.square_name(square_id), (0, 0))
 
     def get_figure_by_square_id(self, square_id: int) -> ChessBoardFigure:

@@ -8,12 +8,12 @@ import pygame
 import chess
 import chess.engine
 
-from config.globals import ENGINE_PATH
-from src.enums import ChessColor, OverlayType, PowerUpTypes
-from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
-from src.mid_game.chess_board_figure import ChessBoardFigure
-from src.mid_game.chess_board_gui import ChessBoardGui
-from src.mid_game.player import Player
+from ...config.globals import ENGINE_PATH
+from ...enums import ChessColor, OverlayType, PowerUpTypes
+from ...gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
+from ...mid_game.chess_board_figure import ChessBoardFigure
+from ...mid_game.chess_board_gui import ChessBoardGui
+from ...mid_game.player import Player
 
 
 class MidGamePlayerTurn(MidGameBaseState):

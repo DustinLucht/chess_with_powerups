@@ -1,3 +1,6 @@
+"""
+This module contains the EvaluationBar class.
+"""
 import math
 import threading
 
@@ -5,7 +8,7 @@ import chess
 import chess.engine
 import pygame
 
-from config.globals import ENGINE_PATH
+from ..config.globals import ENGINE_PATH
 
 COLOR_WHITE = pygame.Color(255, 255, 255)
 COLOR_BLACK = pygame.Color(0, 0, 0)

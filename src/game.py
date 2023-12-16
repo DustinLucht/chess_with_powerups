@@ -1,8 +1,11 @@
+"""
+This module contains the Game class.
+"""
 import pygame
 import pygame_widgets
 
-from src.enums import GameState, PersistentDataKeys
-from src.gamestates.base import BaseState
+from .enums import GameState, PersistentDataKeys
+from .gamestates.base import BaseState
 
 
 class Game:

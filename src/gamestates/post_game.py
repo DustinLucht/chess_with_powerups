@@ -4,9 +4,9 @@ Game Over State
 import chess
 import pygame
 
-from src.gamestates.base import BaseState
-from src.enums import PersistentDataKeys, GameState
-from src.mid_game.chess_board_gui import ChessBoardGui
+from ..gamestates.base import BaseState
+from ..enums import PersistentDataKeys, GameState
+from ..mid_game.chess_board_gui import ChessBoardGui
 
 
 class PostGame(BaseState):

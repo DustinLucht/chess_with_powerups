@@ -2,8 +2,8 @@
 Menu game state
 """
 import pygame
-from src.gamestates.base import BaseState
-from src.enums import GameState, PersistentDataKeys
+from ..gamestates.base import BaseState
+from ..enums import GameState, PersistentDataKeys
 
 
 class Menu(BaseState):

@@ -7,16 +7,16 @@ import pygame
 import chess
 import chess.engine
 
-from src.enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState, \
+from ..enums import MidGameState, PersistentDataKeys, ChessColor, MidGamePersistentDataKeys, GameState, \
     GlobalConstants, PowerUpTypes
-from src.gamestates.base import BaseState
-from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
-from src.gamestates.mid_game_gamestates.mid_game_pause import MidGamePause
-from src.gamestates.mid_game_gamestates.mid_game_ai_turn import MidGameAiTurn
-from src.gamestates.mid_game_gamestates.mid_game_player_turn import MidGamePlayerTurn
-from src.mid_game.chess_board_gui import ChessBoardGui
-from src.mid_game.player_ui import PlayerUI
-from src.mid_game.power_ups import PowerUp, DestroyPowerUp, DoubleMovePowerUp, AIHelpsPowerUp, RandomPromotionPowerUp
+from ..gamestates.base import BaseState
+from ..gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
+from ..gamestates.mid_game_gamestates.mid_game_pause import MidGamePause
+from ..gamestates.mid_game_gamestates.mid_game_ai_turn import MidGameAiTurn
+from ..gamestates.mid_game_gamestates.mid_game_player_turn import MidGamePlayerTurn
+from ..mid_game.chess_board_gui import ChessBoardGui
+from ..mid_game.player_ui import PlayerUI
+from ..mid_game.power_ups import PowerUp, DestroyPowerUp, DoubleMovePowerUp, AIHelpsPowerUp, RandomPromotionPowerUp
 
 SQUARE_SIZE = int(GlobalConstants.Y_SCREEN_SIZE.value * GlobalConstants.SQUARE_SIZE_MULTIPLIER.value)
 PIECES_SIZE = GlobalConstants.PIECES_SIZE.value

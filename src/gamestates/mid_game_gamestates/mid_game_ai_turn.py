@@ -5,10 +5,10 @@ import chess
 import chess.engine
 import threading
 
-from config.globals import ENGINE_PATH
-from src.enums import ChessColor
-from src.gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
-from src.mid_game.chess_board_gui import ChessBoardGui
+from ...config.globals import ENGINE_PATH
+from ...enums import ChessColor
+from ...gamestates.mid_game_gamestates.mid_game_base import MidGameBaseState
+from ...mid_game.chess_board_gui import ChessBoardGui
 
 
 class MidGameAiTurn(MidGameBaseState):

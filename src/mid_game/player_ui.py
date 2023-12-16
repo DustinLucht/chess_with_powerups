@@ -4,16 +4,16 @@ This module contains the mid game players ui gamestate.
 import chess.engine
 import pygame
 
-from src.enums import OverlayType, MidGamePersistentDataKeys, PowerUpTypes
-from src.mid_game.evaluation_bar import EvaluationBar
-from src.mid_game.player import Player
-from src.mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
+from ..enums import OverlayType, MidGamePersistentDataKeys, PowerUpTypes
+from ..mid_game.evaluation_bar import EvaluationBar
+from ..mid_game.player import Player
+from ..mid_game.square_overlays import SquareOverlayPowerupBackground, SquareOverlayPowerUp
 
 POWERUPS_IMAGE_PATHS = {
-    PowerUpTypes.DESTROY: r"..\assets\images\powerups\craiyon_184052_chess_pawn_logo_on_fire_with_dark_background.png",
-    PowerUpTypes.DOUBLE_MOVE: r"..\assets\images\powerups\craiyon_184729_black_chess_pawn_with_a__2x__marking.png",
-    PowerUpTypes.AI_HELPS: r"..\assets\images\powerups\craiyon_184158_A_Robot_staring_at_a_chess_board.png",
-    PowerUpTypes.RANDOM_PROMOTION: r"..\assets\images\powerups\craiyon_184538_A_chess_pawn_with_a_large_question_mark_"
+    PowerUpTypes.DESTROY: r"assets\images\powerups\craiyon_184052_chess_pawn_logo_on_fire_with_dark_background.png",
+    PowerUpTypes.DOUBLE_MOVE: r"assets\images\powerups\craiyon_184729_black_chess_pawn_with_a__2x__marking.png",
+    PowerUpTypes.AI_HELPS: r"assets\images\powerups\craiyon_184158_A_Robot_staring_at_a_chess_board.png",
+    PowerUpTypes.RANDOM_PROMOTION: r"assets\images\powerups\craiyon_184538_A_chess_pawn_with_a_large_question_mark_"
                                    r"above_it__surrounded_by_silhouettes_of_higher.png",
 }
 
