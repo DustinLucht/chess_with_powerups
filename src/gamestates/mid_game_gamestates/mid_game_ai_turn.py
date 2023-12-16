@@ -30,7 +30,9 @@ class MidGameAiTurn(MidGameBaseState):
     def startup(self, mid_game_persistent):
         super(MidGameAiTurn, self).startup(mid_game_persistent)
         # Make the AI move in a separate process
-        self._make_ai_move()
+        # extra check if game is over
+        if not self.board.is_game_over():
+            self._make_ai_move()
 
     def draw(self, surface):
         self.board_gui.draw(surface)

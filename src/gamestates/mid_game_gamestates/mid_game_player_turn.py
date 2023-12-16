@@ -289,6 +289,7 @@ class MidGamePlayerTurn(MidGameBaseState):
         """
         self.active_powerup = None
         self.engine = chess.engine.SimpleEngine.popen_uci(ENGINE_PATH)
+        self.wait_for_separate_player_input = True
         self._make_ai_helps_move()
 
     def _activate_powerup_random_promotion(self):
@@ -336,3 +337,4 @@ class MidGamePlayerTurn(MidGameBaseState):
     def _ai_helps_play_threaded(self, board, time_limit):
         result = self.engine.play(board, chess.engine.Limit(time=time_limit))
         self._callback(result)
+        self.wait_for_separate_player_input = False
