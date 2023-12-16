@@ -124,6 +124,9 @@ class ChessBoardGui:
                     overlay_type = OverlayType.POSSIBLE_MOVE_NORMAL
                 else:
                     overlay_type = OverlayType.POSSIBLE_MOVE_ATTACK
+                    # cause of double move check if attacking the king
+                    if self.board.piece_at(destination_square).piece_type == chess.KING:
+                        continue
 
                 self.overlays.append(SquareOverlayMove(overlay_type,
                                                        self._get_square_coordinates_for_centered_figure(
@@ -168,7 +171,7 @@ class ChessBoardGui:
             # add the selected figure overlay
             self.overlays.append(
                 SquareOverlayPromotion(figure_to_promotion_enum[promotion_figure], current_center_pos, self.square_size,
-                                       square_id, f".assets\\images\\pieces\\{PIECES[promotion_figure]}"))
+                                       square_id, f"assets\\images\\pieces\\{PIECES[promotion_figure]}"))
             current_center_pos = (current_center_pos[0], current_center_pos[1] + self.square_size)
 
     def set_figure_to_square(self, square_id: int, player_color: ChessColor, selected_promotion: OverlayType) -> None:

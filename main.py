@@ -15,19 +15,24 @@ from src.gamestates.splash import Splash
 
 
 if __name__ == "__main__":
-    pygame.init()
-    screen = pygame.display.set_mode((GlobalConstants.X_SCREEN_SIZE.value, GlobalConstants.Y_SCREEN_SIZE.value))
-    pygame.display.set_caption("Schach mit Power-Ups")
-    states = {
-        GameState.SPLASH: Splash(),
-        GameState.MENU: Menu(),
-        GameState.PRE_GAME: PreGame(),
-        GameState.MID_GAME: MidGame(),
-        GameState.POST_GAME: PostGame(),
-    }
+    try:
+        pygame.init()
+        screen = pygame.display.set_mode((GlobalConstants.X_SCREEN_SIZE.value, GlobalConstants.Y_SCREEN_SIZE.value))
+        pygame.display.set_caption("Schach mit Power-Ups")
+        states = {
+            GameState.SPLASH: Splash(),
+            GameState.MENU: Menu(),
+            GameState.PRE_GAME: PreGame(),
+            GameState.MID_GAME: MidGame(),
+            GameState.POST_GAME: PostGame(),
+        }
 
-    game = Game(screen, states, GameState.SPLASH)
-    game.run()
+        game = Game(screen, states, GameState.SPLASH)
+        game.run()
 
-    pygame.quit()
-    sys.exit()
+        pygame.quit()
+        sys.exit()
+    except Exception as e:
+        print(e)
+        pygame.quit()
+        sys.exit()
